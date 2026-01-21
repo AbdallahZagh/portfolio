@@ -5,7 +5,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-muted/20 bg-linear-to-b from-primary/10 via-primary/5 to-background/95 py-10">
-      <div className="container mx-aut lg:px-10">
+      <div className="container mx-auto px-10">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1.7fr)_minmax(0,1.3fr)] items-start">
           <div className="space-y-3">
             <p className="text-xs font-mono uppercase tracking-[0.3em] text-primary">
