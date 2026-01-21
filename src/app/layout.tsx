@@ -20,7 +20,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://abdallahzagh.github.io/portfolio/"), // Update with your actual URL
+  metadataBase: new URL("https://abdallahzagh.github.io/portfolio"),
   title: {
     default: "Abdallah Zaghloul - Frontend Developer & Team Lead | React, Next.js, Three.js",
     template: "%s | Abdallah Zaghloul Portfolio",
