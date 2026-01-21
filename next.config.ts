@@ -7,8 +7,8 @@ const repoName = "portfolio"; // Change this to your repo name
 const isProduction = process.env.NODE_ENV === "production";
 
 const nextConfig: NextConfig = {
-  // Only enable static export for production builds (GitHub Pages)
-  ...(isProduction && { output: "export" }),
+  // Enable static export for production builds (GitHub Pages)
+  ...(isProduction ? { output: "export" as const } : {}),
   images: {
     unoptimized: true, // Required for static export
   },
