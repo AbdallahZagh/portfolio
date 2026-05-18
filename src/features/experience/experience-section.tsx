@@ -2,14 +2,37 @@
 
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CertificatePreview } from "@/features/experience/certificate-preview";
 import { fadeInUp, staggerContainer } from "@/lib/animation-variants";
 import { Calendar, MapPin, GraduationCap } from "lucide-react";
 
-const experiences = [
+type Experience = {
+  title: string;
+  company: string;
+  period: string;
+  location: string;
+  achievements: string[];
+  certificate?: { src: string; alt: string };
+};
+
+const experiences: Experience[] = [
+  {
+    title: "Frontend Web Developer",
+    company: "Sama-Tech",
+    period: "Mar 2026 - Present",
+    location: "On-Site",
+    achievements: [
+      "Engineered a multi-page corporate marketing website using Next.js 16 and React 19, showcasing IoT and ESG solutions with interactive, scroll-driven UI behaviors powered by Framer Motion and GSAP.",
+      "Built a multi-module admin dashboard (Sama Fire) utilizing React 19 and Vite for real-time gateway monitoring, incident events, and maintenance workflows.",
+      "Implemented role-based access control, organization-wide filtering, and Firebase push notifications, ensuring live data synchronization across events and Mapbox GL map views.",
+      "Architected modular, responsive front-end solutions using Tailwind CSS v4, TypeScript, and Zustand.",
+      "Lead and mentor a 3-member frontend team, overseeing technical decisions and ensuring high-quality delivery.",
+    ],
+  },
   {
     title: "Frontend Team Lead (React)",
     company: "PawsPalConnect",
-    period: "Oct 2025 - Present",
+    period: "Oct 2025 - Feb 2026",
     location: "Remote",
     achievements: [
       "Lead and mentor a 3-member frontend team, overseeing technical decisions and ensuring high-quality delivery.",
@@ -18,6 +41,10 @@ const experiences = [
       "Implemented a modern, responsive design system using Tailwind CSS v4, reducing CSS technical debt.",
       "Integrated real-time data visualization using Chart.js and Recharts for operational insights.",
     ],
+    certificate: {
+      src: "/ppc-certificate.png",
+      alt: "Internship completion certificate — Paws Pal Connect (NPT Solutions), Front-End Team Lead Intern, Abdallah Zaghloul, October 2025 to February 2026",
+    },
   },
   {
     title: "Frontend Web Developer (Freelance)",
@@ -64,8 +91,9 @@ export function ExperienceSection() {
             Experience &amp; <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent"> Education</span>
           </h2>
           <p className="max-w-2xl xl:max-w-3xl 2xl:max-w-4xl mx-auto md:mx-0 text-base sm:text-lg md:text-xl lg:text-2xl text-muted leading-relaxed">
-            From pet care platforms and dashboards to high-motion creative sites, I lead and ship
-            React-based frontends that balance performance, DX, and long-term maintainability.
+            From IoT safety dashboards and enterprise marketing sites to pet-care platforms and
+            high-motion creative work, I lead and ship React-based frontends that balance performance,
+            DX, and long-term maintainability.
           </p>
         </motion.div>
 
@@ -74,11 +102,11 @@ export function ExperienceSection() {
           variants={staggerContainer}
           initial="initial"
           whileInView="animate"
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.06 }}
         >
           <div className="space-y-6 border-l border-primary/30 pl-4 md:pl-6">
-            {experiences.map((exp, index) => (
-              <motion.div key={index} variants={fadeInUp}>
+            {experiences.map((exp) => (
+              <motion.div key={`${exp.company}-${exp.period}`} variants={fadeInUp}>
                 <Card className="relative overflow-hidden bg-card/95 before:absolute before:left-0 before:top-0 before:h-full before:w-1 before:bg-gradient-to-b before:from-primary/80 before:to-secondary/80">
                   <CardHeader className="pb-3">
                     <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
@@ -98,11 +126,14 @@ export function ExperienceSection() {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>
+                  {exp.certificate ? (
+                    <CertificatePreview src={exp.certificate.src} alt={exp.certificate.alt} />
+                  ) : null}
+                  <CardContent className="pt-0">
                     <ul className="space-y-2 text-sm text-muted">
                       {exp.achievements.map((achievement, idx) => (
                         <li key={idx} className="flex gap-2">
-                          <span className="mt-1 text-primary">▹</span>
+                          <span className="text-primary">▹</span>
                           <span>{achievement}</span>
                         </li>
                       ))}

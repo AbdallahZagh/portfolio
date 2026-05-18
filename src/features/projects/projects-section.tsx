@@ -2,22 +2,61 @@
 
 import { motion } from "framer-motion";
 import { staggerContainer } from "@/lib/animation-variants";
-import { 
-  Heart, 
-  Sparkles, 
-  Building2, 
-  Users, 
+import {
+  Heart,
+  Sparkles,
+  Building2,
+  Users,
   ShoppingCart,
-  HeartPulse
+  HeartPulse,
+  Flame,
+  Globe2,
 } from "lucide-react";
 import StarryNightSky from "@/components/three/starry-night-sky";
 import { ProjectCard, type Project } from "./project-card";
 
 const projects: Project[] = [
   {
+    name: "Sama Fire – IoT Fire Safety Dashboard",
+    description:
+      "Multi-module admin dashboard for real-time gateway monitoring, incident events, and maintenance workflows. Role-based access, organization-wide filtering, Firebase push notifications, and live sync across event streams and Mapbox GL map views.",
+    tools: [
+      "React 19",
+      "Vite",
+      "Tailwind CSS v4",
+      "Zustand",
+      "Mapbox GL",
+      "Firebase (FCM)",
+      "REST APIs",
+    ],
+    github: null,
+    demo1: null,
+    demo2: 'https://sama-tech.ae/fire-fighting/',
+    figma: null,
+    icon: Flame,
+  },
+  {
+    name: "Sama.Tech – Corporate Landing & Marketing Site",
+    description:
+      "Multi-page enterprise marketing site highlighting smart building, IoT, and ESG solutions. Interactive UI with Framer Motion and GSAP—smooth category transitions, animated product hotspots, and scroll-driven motion.",
+    tools: [
+      "Next.js 16",
+      "React 19",
+      "TypeScript",
+      "Tailwind CSS v4",
+      "Framer Motion",
+      "GSAP",
+    ],
+    github: null,
+    demo1: null,
+    demo2: "https://sama-tech.ae/landing-page",
+    figma: null,
+    icon: Globe2,
+  },
+  {
     name: "PawsPalConnect – Pet Care & E-Commerce Platform",
     description:
-      "Production pet-care platform for veterinary appointment booking, vaccination tracking, and pet product purchases. Led frontend architecture, state management, and dashboard development.",
+      "Full-scale e-commerce and medical tracking platform. Led frontend strategy with global state management and REST API integrations for complex user data—appointments, vaccination tracking, and operational dashboards.",
     tools: [
       "React",
       "Redux Toolkit",
@@ -29,7 +68,7 @@ const projects: Project[] = [
       "React-hot-toast"
     ],
     github: "https://github.com/pawspalconnect/paws_pal_connect_website",
-    demo1: "https://ppc-website-test.vercel.app/",
+    demo1: "https://www.pawspalconnect.com/",
     demo2: null,
     figma: null,
     icon: Heart
@@ -37,7 +76,7 @@ const projects: Project[] = [
   {
     name: "Digital Studio – Interactive Creative Website",
     description:
-      "Interactive, animation-rich creative website focused on immersive user experience. Implemented advanced animations and 3D visual interactions.",
+      "Immersive creative experience with GSAP-driven animation and Three.js 3D elements. Tuned for smooth rendering and strong performance in high-motion web environments.",
     tools: [
       "React",
       "Tailwind CSS",
@@ -51,9 +90,9 @@ const projects: Project[] = [
     icon: Sparkles
   },
   {
-    name: "Clinic Management System",
+    name: "Clinic Management System (Administrative & Doctor Dashboards)",
     description:
-      "Administrative and doctor dashboards for managing appointments, patient records, and clinic operations with a focus on workflow efficiency.",
+      "Administrative and doctor dashboards built for workflow efficiency across appointments and patient records. Full i18n support for international clinic operations.",
     tools: [
       "React",
       "Redux Toolkit",
@@ -71,7 +110,7 @@ const projects: Project[] = [
   {
     name: "HR Management System",
     description:
-      "Internal dashboard system for employee profiles, attendance tracking, and leave management with real-time data visualization.",
+      "Internal tooling for employee profiles, attendance, and leave management with real-time attendance visualization.",
     tools: [
       "React",
       "Tailwind CSS",
@@ -87,7 +126,7 @@ const projects: Project[] = [
   {
     name: "E-Commerce Web Application",
     description:
-      "Responsive e-commerce frontend featuring product browsing, cart management, and real-time global state synchronization.",
+      "High-performance storefront and dashboard with reliable real-time state synchronization for cart and catalog flows.",
     tools: [
       "React",
       "Redux",
@@ -105,7 +144,7 @@ const projects: Project[] = [
   {
     name: "Medical Clinic System (Infertility Clinic)",
     description:
-      "Patient-facing interface including registration forms and medical history views, designed with accessibility and internationalization in mind.",
+      "Patient-facing flows with a strong focus on accessibility and mobile responsiveness. Worked with cross-functional teams and tightened performance to reduce critical bottlenecks in legacy areas.",
     tools: [
       "React",
       "Tailwind CSS",
@@ -159,10 +198,10 @@ export function ProjectsSection() {
           variants={staggerContainer}
           initial="initial"
           whileInView="animate"
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.06 }}
         >
-          {projects.map((project, index) => (
-            <ProjectCard key={index} project={project} index={index} />
+          {projects.map((project) => (
+            <ProjectCard key={project.name} project={project} />
           ))}
         </motion.div>
       </div>

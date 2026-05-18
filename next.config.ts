@@ -6,17 +6,22 @@ const repoName = "portfolio"; // Change this to your repo name
 
 const isProduction = process.env.NODE_ENV === "production";
 
+const publicBasePath = isProduction && repoName ? `/${repoName}` : "";
+
 const nextConfig: NextConfig = {
   // Enable static export for production builds (GitHub Pages)
   ...(isProduction ? { output: "export" as const } : {}),
+  env: {
+    NEXT_PUBLIC_BASE_PATH: publicBasePath,
+  },
   images: {
     unoptimized: true, // Required for static export
   },
   // Base path for GitHub Pages (only in production)
   // Leave empty if deploying to username.github.io (root domain)
-  basePath: isProduction && repoName ? `/${repoName}` : "",
+  basePath: publicBasePath,
   // Asset prefix for GitHub Pages (only in production)
-  assetPrefix: isProduction && repoName ? `/${repoName}` : "",
+  assetPrefix: publicBasePath,
   // Trailing slash for GitHub Pages compatibility
   trailingSlash: true,
 };

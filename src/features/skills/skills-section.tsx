@@ -4,23 +4,56 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { fadeInUp, staggerContainer } from "@/lib/animation-variants";
-import { Code2, Layers, Sparkles, Database, Settings, Globe2, Palette } from "lucide-react";
+import {
+  Code2,
+  Layers,
+  Sparkles,
+  Database,
+  Settings,
+  Palette,
+  Languages,
+  ListTodo,
+} from "lucide-react";
 
 const skills = {
   frontend: [
     "React (18/19)",
-    "Next.js",
+    "Next.js (16)",
     "TypeScript (Core)",
     "JavaScript (ES6+)",
     "HTML5",
     "CSS3",
     "React Router",
   ],
-  stateManagement: ["Redux", "Redux Toolkit", "Context API"],
-  uiMotion: ["Tailwind CSS (v4)", "Material UI", "GSAP", "Framer Motion", "DaisyUI"],
-  interactive: ["Three.js"],
-  apisTooling: ["REST APIs", "Axios", "Vite", "Git", "GitHub"],
-  process: ["Agile/Scrum", "Sprint Planning", "Code Reviews", "Plane (Project Management)"],
+  stateAndData: [
+    "Redux",
+    "Redux Toolkit",
+    "Zustand",
+    "React Query",
+    "Context API",
+  ],
+  uiMotion: [
+    "Tailwind CSS (v4)",
+    "Material UI",
+    "GSAP",
+    "Framer Motion",
+    "DaisyUI",
+  ],
+  interactive: ["Three.js", "Mapbox GL"],
+  apisTooling: [
+    "REST APIs",
+    "Firebase (FCM)",
+    "Axios",
+    "Vite",
+    "Git",
+    "GitHub",
+  ],
+  process: [
+    "Agile/Scrum",
+    "Sprint Planning",
+    "Code Reviews",
+    "Plane (Project Management)",
+  ],
   localization: ["i18n", "i18next"],
 };
 
@@ -34,9 +67,9 @@ const skillCategories = [
     iconColor: "text-blue-400",
   },
   {
-    title: "State Management",
+    title: "State & Data Fetching",
     icon: Database,
-    skills: skills.stateManagement,
+    skills: skills.stateAndData,
     gradient: "from-purple-500/20 to-pink-500/20",
     borderColor: "border-purple-500/30",
     iconColor: "text-purple-400",
@@ -50,7 +83,7 @@ const skillCategories = [
     iconColor: "text-yellow-400",
   },
   {
-    title: "3D & Interactive",
+    title: "3D, Maps & Interactive",
     icon: Layers,
     skills: skills.interactive,
     gradient: "from-emerald-500/20 to-teal-500/20",
@@ -58,7 +91,7 @@ const skillCategories = [
     iconColor: "text-emerald-400",
   },
   {
-    title: "APIs & Tooling",
+    title: "APIs, Cloud & Tooling",
     icon: Settings,
     skills: skills.apisTooling,
     gradient: "from-indigo-500/20 to-blue-500/20",
@@ -66,9 +99,17 @@ const skillCategories = [
     iconColor: "text-indigo-400",
   },
   {
-    title: "Process & Localization",
-    icon: Globe2,
-    skills: skills.process.concat(skills.localization),
+    title: "Process",
+    icon: ListTodo,
+    skills: skills.process,
+    gradient: "from-slate-500/20 to-zinc-500/20",
+    borderColor: "border-slate-500/30",
+    iconColor: "text-slate-400",
+  },
+  {
+    title: "Localization",
+    icon: Languages,
+    skills: skills.localization,
     gradient: "from-rose-500/20 to-red-500/20",
     borderColor: "border-rose-500/30",
     iconColor: "text-rose-400",
@@ -83,7 +124,7 @@ export function SkillsSection() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.15 }}
           transition={{ duration: 0.5 }}
           className="mb-16 text-center"
         >
@@ -91,10 +132,14 @@ export function SkillsSection() {
             Skills
           </p>
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold leading-tight mb-4">
-            Technologies &amp; <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">Tools</span>
+            Technologies &amp;{" "}
+            <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+              Tools
+            </span>
           </h2>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted max-w-2xl xl:max-w-3xl 2xl:max-w-4xl mx-auto leading-relaxed">
-            A comprehensive stack for building modern, scalable, and performant web applications
+            Stack aligned with production work across dashboards, marketing sites, and creative
+            experiences
           </p>
         </motion.div>
 
@@ -103,7 +148,7 @@ export function SkillsSection() {
           variants={staggerContainer}
           initial="initial"
           whileInView="animate"
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.08 }}
         >
           {skillCategories.map((category, index) => {
             const Icon = category.icon;
@@ -115,15 +160,19 @@ export function SkillsSection() {
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
                 <Card className="group relative h-full overflow-hidden rounded-xl border-none bg-card/80 backdrop-blur-xl transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10">
-                  {/* Gradient Background */}
-                  <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-50 transition-opacity duration-300`} />
-                  
-                  {/* Animated Border */}
-                  <div className={`absolute inset-0 rounded-xl border-2 ${category.borderColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-                  
+                  <div
+                    className={`absolute inset-0 rounded-xl bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-50 transition-opacity duration-300`}
+                  />
+
+                  <div
+                    className={`absolute inset-0 rounded-xl border-2 ${category.borderColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
+                  />
+
                   <CardHeader className="relative z-10 pb-3">
                     <div className="flex items-center flex-col gap-3 mb-3">
-                      <div className={`p-3 rounded-lg bg-primary/10 ${category.iconColor} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6`}>
+                      <div
+                        className={`p-3 rounded-lg bg-primary/10 ${category.iconColor} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6`}
+                      >
                         <Icon className="h-7 w-7" />
                       </div>
                       <CardTitle className="text-lg text-center font-bold font-display">
@@ -131,7 +180,7 @@ export function SkillsSection() {
                       </CardTitle>
                     </div>
                   </CardHeader>
-                  
+
                   <CardContent className="relative z-10 pt-0">
                     <div className="flex flex-wrap gap-2">
                       {category.skills.map((skill, skillIndex) => (
@@ -139,12 +188,12 @@ export function SkillsSection() {
                           key={skill}
                           initial={{ opacity: 0, scale: 0.8 }}
                           whileInView={{ opacity: 1, scale: 1 }}
-                          viewport={{ once: true }}
+                          viewport={{ once: true, amount: 0.1 }}
                           transition={{ delay: index * 0.1 + skillIndex * 0.05 }}
                           whileHover={{ scale: 1.1, y: -2 }}
                         >
-                          <Badge 
-                            variant="outline" 
+                          <Badge
+                            variant="outline"
                             className="cursor-default border-border/40 bg-background/60 backdrop-blur text-xs font-medium px-3 py-1 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
                           >
                             {skill}
@@ -153,8 +202,7 @@ export function SkillsSection() {
                       ))}
                     </div>
                   </CardContent>
-                  
-                  {/* Decorative Corner */}
+
                   <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </Card>
               </motion.div>
@@ -162,11 +210,10 @@ export function SkillsSection() {
           })}
         </motion.div>
 
-        {/* Bottom CTA/Info */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.15 }}
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mt-16 text-center"
         >
