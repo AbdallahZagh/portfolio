@@ -3,6 +3,9 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { publicAsset } from "@/lib/public-asset";
+
+const iconUrl = publicAsset("/logo.png");
 
 const inter = Inter({
   subsets: ["latin"],
@@ -100,9 +103,9 @@ export const metadata: Metadata = {
     canonical: "https://abdallahzagh.github.io/portfolio/",
   },
   icons: {
-    icon: '/logo.png',
-    shortcut: '/logo.png',
-    apple: '/logo.png',
+    icon: [{ url: iconUrl, type: "image/png" }],
+    shortcut: [{ url: iconUrl, type: "image/png" }],
+    apple: [{ url: iconUrl, type: "image/png" }],
   },
 };
 
@@ -114,6 +117,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href={iconUrl} type="image/png" />
+        <link rel="shortcut icon" href={iconUrl} type="image/png" />
+        <link rel="apple-touch-icon" href={iconUrl} />
         <link rel="canonical" href="https://abdallahzagh.github.io/portfolio/" />
         <script
           type="application/ld+json"
