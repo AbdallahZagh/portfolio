@@ -1,90 +1,71 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
-import { fadeInUp, staggerContainer } from "@/lib/animation-variants";
+import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Mail, Download } from "lucide-react";
-import InteractiveSphere from "@/components/three/interactive-sphere";
+import { Download, Mail } from "lucide-react";
+import { publicAsset } from "@/lib/public-asset";
+import { site } from "@/data/portfolio";
+import { fadeInUp, staggerContainer } from "@/lib/animation-variants";
+
+const HeroScene = dynamic(() => import("@/components/three/hero-scene"), {
+  ssr: false,
+});
 
 export function HeroSection() {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.6]);
-
   return (
     <section
       id="home"
-      className="relative flex min-h-screen items-center justify-center px-4 py-20 md:px-6"
+      className="relative flex min-h-[calc(100dvh-4rem)] flex-col justify-center border-b border-border"
     >
-      <InteractiveSphere />
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/25 via-background/75 to-secondary/25" aria-hidden="true" />
-
-
       <motion.div
-        ref={ref}
-        style={{ y, opacity }}
-        className="relative z-10 w-full space-y-6 sm:space-y-8 text-left px-4 sm:px-6 lg:px-8"
+        className="page-wrap relative z-10 grid w-full flex-1 items-center gap-8 py-8 md:grid-cols-2 md:min-h-[calc(100dvh-4rem)] md:gap-10 md:py-0 lg:gap-8"
+        initial="hidden"
+        animate="visible"
         variants={staggerContainer}
-        initial="initial"
-        animate="animate"
       >
-        <motion.h1
-          variants={fadeInUp}
-          className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold leading-[1.1] text-foreground"
-        >
-          Abdallah <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
-          Zaghloul
-          </span>
-        </motion.h1>
-        <motion.p
-          variants={fadeInUp}
-          className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-display uppercase tracking-[0.2em] sm:tracking-[0.3em] text-primary"
-        >
-          Frontend Developer &amp; Team Lead (React)
-        </motion.p>
-        <motion.p
-          variants={fadeInUp}
-          className="max-w-2xl xl:max-w-3xl 2xl:max-w-4xl text-base sm:text-lg md:text-xl lg:text-2xl text-muted leading-relaxed"
-        >
-          Frontend Developer and Team Lead with 3+ years of experience building scalable, user-centric web
-          applications using React, Redux, and Tailwind CSS. Proven track record in architecting clean
-          frontend solutions and leading distributed teams in a remote environment. Expert in creating
-          advanced UI interactions and implementing Agile task management workflows.
-        </motion.p>
+        <div className="relative z-10">
+          <motion.p
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary"
+            variants={fadeInUp}
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-spark" />
+            {site.role}
+          </motion.p>
+          <motion.h1
+            className="mt-3 font-display text-[clamp(2.4rem,5.2vw,4.25rem)] font-semibold leading-[1.05] tracking-tight"
+            variants={fadeInUp}
+          >
+            {site.name}
+          </motion.h1>
+          <motion.p
+            className="mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg"
+            variants={fadeInUp}
+          >
+            {site.bio}
+          </motion.p>
+          <motion.div className="mt-8 flex flex-wrap gap-3" variants={fadeInUp}>
+            <Button href="#contact" size="lg">
+              <Mail className="mr-2 h-4 w-4" />
+              Get in touch
+            </Button>
+            <Button
+              href={publicAsset(site.resumeHref)}
+              download={site.resumeDownload}
+              variant="outline"
+              size="lg"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Download CV
+            </Button>
+          </motion.div>
+        </div>
+
         <motion.div
+          className="relative mx-auto aspect-square w-full max-w-88 sm:max-w-104 md:mx-0 md:aspect-auto md:h-[min(36rem,calc(100dvh-8rem))] md:max-w-none"
           variants={fadeInUp}
-          className="mt-4 flex flex-col gap-4 sm:flex-row items-center"
         >
-          <a href="#contact">
-          <Button size="lg">
-            <Mail className="mr-2 h-5 w-5" />
-            Get In Touch
-          </Button>
-          </a>
-          <a href="/ABDALLAH_ZAGHLOUL_RESUME.pdf" // Path relative to public folder
-      download="ABDALLAH_ZAGHLOUL_RESUME.pdf">
-          <Button variant="outline" size="lg">
-            <Download className="mr-2 h-5 w-5" />
-            Download CV
-          </Button>
-          </a>
-        </motion.div>
-        <motion.div
-          variants={fadeInUp}
-          className="mt-4 flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-center text-xs sm:text-sm md:text-base text-muted"
-        >
-          <span className="rounded-full border border-primary/40 bg-background/80 px-3 py-1 font-mono uppercase tracking-[0.2em] backdrop-blur">
-            Available for worldwide remote opportunities
-          </span>
-          <span className="rounded-full border border-secondary/40 bg-background/80 px-3 py-1 font-mono uppercase tracking-[0.2em] backdrop-blur">
-            📍 Damascus, Syria (Remote)
-          </span>
+          <HeroScene />
         </motion.div>
       </motion.div>
     </section>

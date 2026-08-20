@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SmoothScroll } from "@/components/smooth-scroll";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -11,7 +12,7 @@ const inter = Inter({
   adjustFontFallback: true,
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s | Abdallah Zaghloul Portfolio",
   },
   description:
-    "Frontend Developer and Team Lead with 3+ years of experience building scalable, user-centric web applications using React, Redux, Next.js, and Tailwind CSS. Expert in advanced UI interactions, 3D web experiences with Three.js, and Agile methodologies. Available for worldwide remote opportunities.",
+    "Frontend Developer with 3+ years shipping production React and Next.js apps. Led a 3-person remote team at PawsPalConnect, now building IoT dashboards and motion-heavy marketing sites at Sama-Tech. Also ships API and mobile when needed — including Nova across web, Expo, and NestJS.",
   keywords: [
     "Abdallah Zaghloul",
     "Frontend Developer",
@@ -63,7 +64,7 @@ export const metadata: Metadata = {
     siteName: "Abdallah Zaghloul Portfolio",
     title: "Abdallah Zaghloul - Frontend Developer & Team Lead",
     description:
-      "Frontend Developer and Team Lead with 3+ years of experience building scalable, user-centric web applications using React, Next.js, and Three.js.",
+      "Frontend Developer with 3+ years shipping production React and Next.js apps. IoT dashboards at Sama-Tech, team lead at PawsPalConnect, and Nova across web, Expo, and NestJS.",
     images: [
       {
         url: "/og-image.jpg", // Add your OG image
@@ -77,7 +78,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Abdallah Zaghloul - Frontend Developer & Team Lead",
     description:
-      "Frontend Developer and Team Lead with 3+ years of experience building scalable, user-centric web applications.",
+      "Frontend Developer with 3+ years shipping React and Next.js apps — IoT dashboards, team leadership, and full-stack product work including Nova.",
     creator: "@AbdallahZagh", // Update with your Twitter handle
     images: ["/twitter-image.jpg"], // Add your Twitter image
   },
@@ -145,15 +146,15 @@ export default function RootLayout({
               ],
               worksFor: {
                 "@type": "Organization",
-                name: "PawsPalConnect",
-                jobTitle: "Frontend Team Lead",
+                name: "Sama-Tech",
+                jobTitle: "Frontend Web Developer",
               },
             }),
           }}
         />
       </head>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground`}
+        className={`${inter.variable} ${spaceGrotesk.variable} antialiased bg-background text-foreground`}
       >
         <ThemeProvider
           attribute="class"
@@ -161,7 +162,7 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
+          <SmoothScroll>{children}</SmoothScroll>
         </ThemeProvider>
       </body>
     </html>

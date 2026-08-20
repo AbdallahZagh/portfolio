@@ -13,9 +13,10 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
         className={cn(
           "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors",
           {
-            "bg-primary/10 text-primary": variant === "default",
-            "bg-secondary/10 text-secondary": variant === "secondary",
-            "border border-muted text-foreground": variant === "outline",
+            "bg-primary/12 text-primary": variant === "default",
+            "bg-secondary text-secondary-foreground": variant === "secondary",
+            "border border-border bg-surface text-foreground":
+              variant === "outline",
           },
           className
         )}

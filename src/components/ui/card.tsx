@@ -1,15 +1,18 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export type CardProps = React.HTMLAttributes<HTMLDivElement>;
+export type CardProps = React.HTMLAttributes<HTMLDivElement> & {
+  interactive?: boolean;
+};
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, interactive: _interactive = false, ...props }, ref) => {
     return (
       <article
         ref={ref}
         className={cn(
-          "rounded-2xl border border-muted/25 bg-card/90 p-6 shadow-md backdrop-blur-md transition-all duration-250 hover:-translate-y-1 hover:shadow-lg",
+          "surface-bevel rounded-2xl border border-border bg-card p-6",
+          "transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/60",
           className
         )}
         {...props}
@@ -41,7 +44,7 @@ const CardTitle = React.forwardRef<
     <h3
       ref={ref}
       className={cn(
-        "font-display text-xl md:text-2xl font-semibold leading-snug tracking-tight",
+        "font-display text-xl font-semibold leading-snug tracking-tight md:text-2xl",
         className
       )}
       {...props}
@@ -57,7 +60,7 @@ const CardDescription = React.forwardRef<
   return (
     <p
       ref={ref}
-      className={cn("text-sm md:text-base text-muted", className)}
+      className={cn("text-sm text-muted md:text-base", className)}
       {...props}
     />
   );
@@ -68,9 +71,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-  return (
-    <div ref={ref} className={cn("pt-4 md:pt-6", className)} {...props} />
-  );
+  return <div ref={ref} className={cn("pt-4", className)} {...props} />;
 });
 CardContent.displayName = "CardContent";
 

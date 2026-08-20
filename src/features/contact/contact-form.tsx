@@ -6,9 +6,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import emailjs from "@emailjs/browser";
+import { site } from "@/data/portfolio";
 
-export function ContactForm() {
+const EMAILJS_PUBLIC_KEY =
+  process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "JU0OSAtw3eIOUZnyC";
+const EMAILJS_SERVICE_ID =
+  process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "service_p4og2ep";
+const EMAILJS_TEMPLATE_ID =
+  process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "template_p58b5ov";
+
+function emailJsMessage(error: unknown) {
+  if (typeof error === "string") return error;
+  if (error && typeof error === "object") {
+    const text = "text" in error ? String(error.text) : "";
+    const message = "message" in error ? String(error.message) : "";
+    const detail = text || message;
+    if (/invalid grant|reconnect your gmail/i.test(detail)) {
+      return "Gmail access for EmailJS expired. In the EmailJS dashboard, open Email Services → your Gmail service → Disconnect, then Connect Account again and enable “Send email on your behalf”.";
+    }
+    if (detail && detail !== "Network Error") return detail;
+  }
+  if (error instanceof Error && error.message) return error.message;
+  return `Could not send the message. Email me at ${site.email}`;
+}
+
+export function ContactForm({ className }: { className?: string }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,54 +60,37 @@ export function ContactForm() {
     setSubmitStatus({ type: null, message: "" });
 
     try {
-      // Check if environment variables are set
-      const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "JU0OSAtw3eIOUZnyC";
-      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "service_p4og2ep";
-      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "template_p58b5ov";
-
-      // Debug: Log what we're using (remove in production)
-      console.log("EmailJS Config:", {
-        publicKey: publicKey ? "✓ Set" : "✗ Missing",
-        serviceId: serviceId ? "✓ Set" : "✗ Missing",
-        templateId: templateId ? "✓ Set" : "✗ Missing",
-      });
-
-      if (!publicKey || !serviceId || !templateId) {
-        throw new Error("EmailJS configuration is missing. Please restart your dev server after creating .env.local file.");
-      }
-
-      // Initialize EmailJS with your Public Key
-      emailjs.init(publicKey);
-
-      // Send email using EmailJS
-      // Make sure these variable names match your EmailJS template variables
       const result = await emailjs.send(
-        serviceId,
-        templateId,
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
         {
-          name: formData.name,           // Maps to {{name}} in template
-          email: formData.email,         // Maps to {{email}} in template
-          message: formData.message,     // Maps to {{message}} in template
-          // from_name: formData.name,      // Alternative if template uses {{from_name}}
-          // from_email: formData.email,    // Alternative if template uses {{from_email}}
-          time: new Date().toLocaleString(), // Optional: for {{time}} in template
-        }
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          time: new Date().toLocaleString(),
+          from_name: formData.name,
+          from_email: formData.email,
+          reply_to: formData.email,
+          user_name: formData.name,
+          user_email: formData.email,
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY }
       );
 
-      if (result.text === "OK") {
-        setSubmitStatus({
-          type: "success",
-          message: "Message sent successfully! I'll get back to you soon.",
-        });
-        setFormData({ name: "", email: "", message: "" });
-      } else {
-        throw new Error("Failed to send email");
+      if (result.status !== 200) {
+        throw result;
       }
+
+      setSubmitStatus({
+        type: "success",
+        message: "Message sent successfully! I'll get back to you soon.",
+      });
+      setFormData({ name: "", email: "", message: "" });
     } catch (error) {
       console.error("EmailJS error:", error);
       setSubmitStatus({
         type: "error",
-        message: "Failed to send message. Please try again or contact me directly at f2002.a.z@gmail.com",
+        message: emailJsMessage(error),
       });
     } finally {
       setIsSubmitting(false);
@@ -91,13 +98,13 @@ export function ContactForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      className={cn("flex min-h-0 flex-1 flex-col gap-4", className)}
+    >
+      <div className="space-y-4">
         <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-foreground mb-2"
-          >
+          <label htmlFor="name" className="mb-2 block text-sm text-muted">
             Name
           </label>
           <Input
@@ -109,14 +116,12 @@ export function ContactForm() {
             onChange={handleChange}
             required
             disabled={isSubmitting}
+            autoComplete="name"
           />
         </div>
 
         <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-foreground mb-2"
-          >
+          <label htmlFor="email" className="mb-2 block text-sm text-muted">
             Email
           </label>
           <Input
@@ -128,49 +133,48 @@ export function ContactForm() {
             onChange={handleChange}
             required
             disabled={isSubmitting}
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="message"
-            className="block text-sm font-medium text-foreground mb-2"
-          >
-            Message
-          </label>
-          <Textarea
-            id="message"
-            name="message"
-            placeholder="Tell me about your project or opportunity..."
-            value={formData.message}
-            onChange={handleChange}
-            required
-            disabled={isSubmitting}
-            rows={6}
+            autoComplete="email"
           />
         </div>
       </div>
 
-      {submitStatus.type && (
+      <div className="flex min-h-0 flex-1 flex-col">
+        <label htmlFor="message" className="mb-2 block text-sm text-muted">
+          Message
+        </label>
+        <Textarea
+          id="message"
+          name="message"
+          placeholder="Tell me about your project or opportunity..."
+          value={formData.message}
+          onChange={handleChange}
+          required
+          disabled={isSubmitting}
+          rows={4}
+          className="h-full min-h-[108px] flex-1"
+        />
+      </div>
+
+      {submitStatus.type ? (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-4 rounded-lg text-sm ${
+          className={`rounded-lg border p-4 text-sm ${
             submitStatus.type === "success"
-              ? "bg-primary/10 text-primary border border-primary/20"
-              : "bg-red-500/10 text-red-500 border border-red-500/20"
+              ? "border-primary/20 bg-primary/10 text-primary"
+              : "border-red-500/20 bg-red-500/10 text-red-500"
           }`}
         >
           {submitStatus.message}
         </motion.div>
-      )}
+      ) : null}
 
       <Button
         type="submit"
         size="lg"
-        variant="secondary"
+        variant="primary"
         disabled={isSubmitting}
-        className="w-full"
+        className="mt-auto w-full"
       >
         {isSubmitting ? (
           <>

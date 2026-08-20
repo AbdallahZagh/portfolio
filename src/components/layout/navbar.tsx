@@ -1,173 +1,171 @@
 "use client";
 
-import * as React from "react";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useLenis } from "lenis/react";
+import { navLinks, site } from "@/data/portfolio";
+
+const NAV_OFFSET = -80;
+const SECTION_IDS = ["home", ...navLinks.map((link) => link.href.slice(1))];
+
+function activeFromScroll() {
+  const probe = 96;
+  let current = SECTION_IDS[0];
+
+  for (const id of SECTION_IDS) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    if (el.getBoundingClientRect().top <= probe) current = id;
+  }
+
+  const doc = document.documentElement;
+  if (window.innerHeight + doc.scrollTop >= doc.scrollHeight - 48) {
+    current = SECTION_IDS[SECTION_IDS.length - 1];
+  }
+
+  return `#${current}`;
+}
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [active, setActive] = useState("#home");
+  const lenis = useLenis();
 
-  // Close mobile menu when clicking outside or on a link
+  const syncActive = useCallback(() => {
+    setActive(activeFromScroll());
+  }, []);
+
+  useLenis(syncActive);
+
+  useEffect(() => {
+    window.addEventListener("scroll", syncActive, { passive: true });
+    window.addEventListener("resize", syncActive);
+    return () => {
+      window.removeEventListener("scroll", syncActive);
+      window.removeEventListener("resize", syncActive);
+    };
+  }, [syncActive]);
+
+  const scrollTo = (href: string) => {
+    const el = document.querySelector<HTMLElement>(href);
+    if (!el) return;
+    setActive(href);
+    if (lenis) {
+      lenis.scrollTo(el, { offset: NAV_OFFSET, duration: 1.05 });
+      return;
+    }
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   useEffect(() => {
     if (!isOpen) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      // Don't close if clicking the button or inside the menu
-      if (
-        target.closest('[aria-label="Toggle menu"]') ||
-        target.closest('[data-mobile-menu]')
-      ) {
-        return;
-      }
-      // Close if clicking outside the nav entirely
-      if (!target.closest("nav")) {
-        setIsOpen(false);
-      }
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsOpen(false);
     };
-
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscKey);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscKey);
-    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
   }, [isOpen]);
 
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = isOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
-
-  const navLinks = [
-    { href: "#experience", label: "Experience" },
-    { href: "#projects", label: "Projects" },
-    { href: "#skills", label: "Skills" },
-    { href: "#contact", label: "Contact" },
-  ];
-
-  const toggleMenu = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsOpen((prev) => !prev);
-  };
 
   return (
     <>
-      <nav className="sticky top-0 z-50 w-full border-b border-primary/20 bg-background/50 backdrop-blur-lg shadow-[0_12px_40px_rgba(15,23,42,0.45)]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(250,204,21,0.16),transparent_25%),radial-gradient(circle_at_100%_100%,rgba(168,85,247,0.18),transparent_25%)]" />
-        <div className="relative container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+      <nav className="sticky top-0 z-50 border-b border-border/70 bg-background/75 backdrop-blur-sm">
+        <div className="page-wrap flex h-16 items-center justify-between">
           <a
             href="#home"
-            className="font-display text-base md:text-lg font-semibold tracking-[0.35em] uppercase bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent z-50 relative"
-            onClick={() => setIsOpen(false)}
+            className="font-display text-sm font-semibold tracking-tight text-transparent bg-gradient-to-r from-muted to-primary bg-clip-text"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              scrollTo("#home");
+            }}
           >
-            AZ
+            {site.name}
           </a>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6 text-xs md:text-sm font-medium">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
+
+          <div className="hidden items-center gap-6 md:flex">
+            <div className="relative flex items-center gap-7">
+              {navLinks.map((link) => {
+                const isActive = active === link.href;
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      scrollTo(link.href);
+                    }}
+                    className={`relative py-1 text-sm transition-colors ${
+                      isActive ? "text-foreground" : "text-muted hover:text-foreground"
+                    }`}
+                  >
+                    {isActive ? (
+                      <motion.span
+                        layoutId="nav-active"
+                        className="absolute inset-x-0 -bottom-1 h-px bg-primary"
+                        transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                      />
+                    ) : null}
+                    {link.label}
+                  </a>
+                );
+              })}
+            </div>
             <ThemeToggle />
           </div>
 
-          {/* Mobile Burger Button */}
-          <div className="md:hidden">
-          <ThemeToggle />
-          <button
-            type="button"
-            className="z-50 relative p-2 text-foreground hover:text-primary transition-colors touch-manipulation"
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-            aria-expanded={isOpen}
-          >
-            {isOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
+          <div className="flex items-center gap-1 md:hidden">
+            <ThemeToggle />
+            <button
+              type="button"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground"
+              onClick={() => setIsOpen((open) => !open)}
+              aria-label="Toggle menu"
+              aria-expanded={isOpen}
+            >
+              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
-          
         </div>
       </nav>
 
-      {/* Mobile Menu - Rendered outside nav for proper z-index stacking */}
       <AnimatePresence>
         {isOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[60] md:hidden"
-              onClick={() => setIsOpen(false)}
-              style={{ top: '64px' }}
-            />
-
-            {/* Menu Panel */}
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-16 right-0 bottom-0 w-[280px] sm:w-64 bg-card/95 backdrop-blur-xl border-l border-primary/20 shadow-2xl z-[70] md:hidden overflow-y-auto"
-              data-mobile-menu
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex flex-col p-6 gap-6">
-                {navLinks.map((link, index) => (
-                  <motion.a
-                    key={link.href}
-                    href={link.href}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="text-lg font-medium text-foreground/80 hover:text-primary transition-colors py-2 border-b border-border/20"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {link.label}
-                  </motion.a>
-                ))}
-                {/* <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: navLinks.length * 0.1 }}
-                  className="pt-4 border-t border-border/20"
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 bg-background pt-16 md:hidden"
+          >
+            <div className="page-wrap flex flex-col gap-1 pt-6">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className={`py-3 font-display text-2xl ${
+                    active === link.href ? "text-primary" : "text-foreground"
+                  }`}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setIsOpen(false);
+                    scrollTo(link.href);
+                  }}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-muted">Theme</span>
-                    <ThemeToggle />
-                  </div>
-                </motion.div> */}
-              </div>
-            </motion.div>
-          </>
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>
