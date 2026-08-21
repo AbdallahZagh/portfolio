@@ -19,7 +19,7 @@ export function HeroSection() {
       className="relative flex min-h-[calc(100dvh-4rem)] flex-col justify-center border-b border-border"
     >
       <motion.div
-        className="page-wrap relative z-10 grid w-full flex-1 items-center gap-8 py-8 md:grid-cols-2 md:min-h-[calc(100dvh-4rem)] md:gap-10 md:py-0 lg:gap-8"
+        className="page-wrap relative z-10 grid w-full flex-1 items-center gap-8 py-8 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-2 lg:gap-8 lg:py-0"
         initial="hidden"
         animate="visible"
         variants={staggerContainer}
@@ -62,7 +62,7 @@ export function HeroSection() {
         </div>
 
         <motion.div
-          className="relative mx-auto aspect-square w-full max-w-88 sm:max-w-104 md:mx-0 md:aspect-auto md:h-[min(36rem,calc(100dvh-8rem))] md:max-w-none"
+          className="relative mx-auto aspect-square w-full max-w-88 sm:max-w-104 lg:mx-0 lg:aspect-auto lg:h-[min(36rem,calc(100dvh-8rem))] lg:max-w-none"
           variants={fadeInUp}
         >
           <HeroScene />
