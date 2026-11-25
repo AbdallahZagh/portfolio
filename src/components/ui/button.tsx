@@ -1,8 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { motion, type HTMLMotionProps } from "framer-motion";
-import { magneticSpring } from "@/lib/animation-variants";
 import { cn } from "@/lib/utils";
 
 type MotionConflictKeys =
@@ -17,7 +15,7 @@ export interface ButtonProps
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     "ref" | MotionConflictKeys
   > {
-  variant?: "primary" | "outline" | "ghost" | "secondary";
+  variant?: "primary" | "outline" | "on-deep" | "ghost" | "secondary";
   size?: "sm" | "md" | "lg";
   href?: string;
   asChild?: boolean;
@@ -25,6 +23,9 @@ export interface ButtonProps
   rel?: string;
   download?: string;
 }
+
+const focusRing =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -38,73 +39,52 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       target,
       rel,
       download,
+      type,
       ...props
     },
-    ref
+    ref,
   ) => {
-    const scaleOnHover = variant === "primary" || variant === "secondary";
-    const baseClasses = cn(
-      "inline-flex items-center justify-center rounded-xl font-display font-semibold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+    const resolved = variant === "secondary" ? "primary" : variant;
+    const classes = cn(
+      "inline-flex items-center justify-center gap-2 rounded-full px-5 font-semibold leading-none transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)] disabled:pointer-events-none",
+      focusRing,
       {
-        "bg-primary text-primary-foreground hover:brightness-110":
-          variant === "primary",
-        "border border-border bg-transparent text-foreground transition-colors duration-200 hover:border-primary hover:bg-surface hover:text-primary":
-          variant === "outline",
-        "bg-secondary text-secondary-foreground hover:brightness-110":
-          variant === "secondary",
-        "bg-transparent text-foreground/80 transition-colors duration-200 hover:bg-surface hover:text-foreground":
-          variant === "ghost",
-        "h-9 px-3.5 text-sm": size === "sm",
-        "h-11 px-5 text-sm md:text-base": size === "md",
-        "h-12 px-6 text-base": size === "lg",
+        "bg-brand text-on-brand hover:bg-brand-hover active:bg-brand-press disabled:bg-disabled-bg disabled:text-disabled-fg":
+          resolved === "primary",
+        "border border-line bg-bg text-ink hover:border-ink active:border-ink active:bg-tint disabled:border-transparent disabled:bg-disabled-bg disabled:text-disabled-fg":
+          resolved === "outline",
+        "bg-on-deep text-brand hover:bg-on-deep-hover active:bg-on-deep-press disabled:bg-disabled-bg disabled:text-disabled-fg":
+          resolved === "on-deep",
+        "bg-transparent text-ink hover:bg-tint active:bg-chip-press disabled:text-disabled-fg":
+          resolved === "ghost",
+        "h-11 text-[15px]": size === "sm",
+        "h-[52px] text-[17px]": size === "md",
+        "h-14 text-[17px]": size === "lg",
       },
-      className
+      className,
     );
-
-    const motionProps = (
-      scaleOnHover
-        ? {
-            whileHover: { scale: 1.02 },
-            whileTap: { scale: 0.98 },
-            transition: magneticSpring,
-          }
-        : {
-            whileTap: { scale: 0.99 },
-            transition: { duration: 0.15 },
-          }
-    ) satisfies Pick<
-      HTMLMotionProps<"button">,
-      "whileHover" | "whileTap" | "transition"
-    >;
 
     if (href || asChild) {
       return (
-        <motion.a
+        <a
           href={href}
           target={target}
           rel={rel}
           download={download}
-          className={baseClasses}
+          className={classes}
           ref={ref as React.Ref<HTMLAnchorElement>}
-          {...motionProps}
-          {...(props as HTMLMotionProps<"a">)}
         >
           {children}
-        </motion.a>
+        </a>
       );
     }
 
     return (
-      <motion.button
-        className={baseClasses}
-        ref={ref}
-        {...motionProps}
-        {...(props as HTMLMotionProps<"button">)}
-      >
+      <button ref={ref} type={type ?? "button"} className={classes} {...props}>
         {children}
-      </motion.button>
+      </button>
     );
-  }
+  },
 );
 Button.displayName = "Button";
 

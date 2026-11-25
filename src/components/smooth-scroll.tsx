@@ -22,7 +22,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       if (!el) return;
       event.preventDefault();
       lenisRef.current?.lenis?.scrollTo(el as HTMLElement, {
-        offset: -80,
+        offset: -90,
         duration: 1.15,
       });
     };

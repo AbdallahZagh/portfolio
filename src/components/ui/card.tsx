@@ -6,19 +6,20 @@ export type CardProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, interactive: _interactive = false, ...props }, ref) => {
+  ({ className, interactive = false, ...props }, ref) => {
     return (
       <article
         ref={ref}
         className={cn(
-          "surface-bevel rounded-2xl border border-border bg-card p-6",
-          "transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/60",
-          className
+          "rounded-[18px] border border-line bg-surface p-6",
+          interactive &&
+            "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)] hover:border-brand",
+          className,
         )}
         {...props}
       />
     );
-  }
+  },
 );
 Card.displayName = "Card";
 
@@ -27,26 +28,19 @@ const CardHeader = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   return (
-    <header
-      ref={ref}
-      className={cn("flex flex-col space-y-2", className)}
-      {...props}
-    />
+    <header ref={ref} className={cn("flex flex-col gap-2", className)} {...props} />
   );
 });
 CardHeader.displayName = "CardHeader";
 
 const CardTitle = React.forwardRef<
-  HTMLParagraphElement,
+  HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => {
   return (
     <h3
       ref={ref}
-      className={cn(
-        "font-display text-xl font-semibold leading-snug tracking-tight md:text-2xl",
-        className
-      )}
+      className={cn("text-xl font-semibold leading-snug tracking-tight text-ink", className)}
       {...props}
     />
   );
@@ -58,11 +52,7 @@ const CardDescription = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => {
   return (
-    <p
-      ref={ref}
-      className={cn("text-sm text-muted md:text-base", className)}
-      {...props}
-    />
+    <p ref={ref} className={cn("text-sm text-muted", className)} {...props} />
   );
 });
 CardDescription.displayName = "CardDescription";

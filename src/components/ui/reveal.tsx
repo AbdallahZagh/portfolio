@@ -1,7 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { fadeInUp, inView, staggerContainer } from "@/lib/animation-variants";
 import { cn } from "@/lib/utils";
 
 export function Reveal({
@@ -11,17 +7,7 @@ export function Reveal({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <motion.div
-      className={className}
-      initial="hidden"
-      whileInView="visible"
-      viewport={inView}
-      variants={staggerContainer}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 export function RevealItem({
@@ -33,10 +19,5 @@ export function RevealItem({
   className?: string;
   as?: "div" | "article" | "header" | "li";
 }) {
-  const Component = motion[Tag];
-  return (
-    <Component className={cn(className)} variants={fadeInUp}>
-      {children}
-    </Component>
-  );
+  return <Tag className={cn(className)}>{children}</Tag>;
 }
