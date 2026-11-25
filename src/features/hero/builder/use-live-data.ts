@@ -26,6 +26,70 @@ export function usePrefersReducedMotion() {
   return useReducedMotion() ?? false;
 }
 
+/** Eases a number up from 0 to `target`. With reduced motion it simply returns the target. */
+export function useCountUp(target: number | undefined, duration = 900) {
+  const reduced = usePrefersReducedMotion();
+  const [value, setValue] = useState(0);
+  const current = useRef(0);
+
+  useEffect(() => {
+    if (target === undefined || reduced) return;
+    const from = current.current;
+    const startedAt = performance.now();
+    let frame = 0;
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - startedAt) / duration);
+      const next = from + (target - from) * (1 - Math.pow(1 - progress, 3));
+      current.current = next;
+      setValue(next);
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [target, reduced, duration]);
+
+  if (target === undefined) return undefined;
+  return reduced ? target : value;
+}
+
+// ---------------------------------------------------------------------------
+// Pause: the live widgets only tick while the hero is on screen.
+// ---------------------------------------------------------------------------
+
+let heroInView = true;
+const heroListeners = new Set<() => void>();
+let heroObserver: IntersectionObserver | null = null;
+
+function subscribeHero(onChange: () => void) {
+  heroListeners.add(onChange);
+  if (!heroObserver && typeof IntersectionObserver !== "undefined") {
+    const hero = document.getElementById("home");
+    if (hero) {
+      heroObserver = new IntersectionObserver(([entry]) => {
+        heroInView = entry.isIntersecting;
+        heroListeners.forEach((listener) => listener());
+      });
+      heroObserver.observe(hero);
+    }
+  }
+  return () => {
+    heroListeners.delete(onChange);
+    if (heroListeners.size === 0 && heroObserver) {
+      heroObserver.disconnect();
+      heroObserver = null;
+      heroInView = true;
+    }
+  };
+}
+
+export function useHeroInView() {
+  return useSyncExternalStore(
+    subscribeHero,
+    () => heroInView,
+    () => true,
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Visitor telemetry: real cursor travel, scroll speed, time on page, connection.
 // ---------------------------------------------------------------------------
@@ -47,6 +111,11 @@ const TRAIL_LENGTH = 70;
 export function useTelemetry(): Telemetry {
   const mounted = useMounted();
   const hasPointer = useMatchMedia("(hover: hover) and (pointer: fine)", true);
+  const inView = useRef(true);
+  const heroVisible = useHeroInView();
+  useEffect(() => {
+    inView.current = heroVisible;
+  }, [heroVisible]);
   const distance = useRef(0);
   const last = useRef<TrailPoint | null>(null);
   const trail = useRef<TrailPoint[]>([]);
@@ -79,6 +148,7 @@ export function useTelemetry(): Telemetry {
     window.addEventListener("pointermove", onMove, { passive: true });
 
     const interval = window.setInterval(() => {
+      if (!inView.current) return;
       const now = window.scrollY;
       const raw = Math.abs(now - lastScroll.current) / 0.2;
       lastScroll.current = now;
@@ -217,6 +287,11 @@ function isTextField(target: EventTarget | null): target is HTMLInputElement | H
 export function useTypingSignal(): Signal {
   const mounted = useMounted();
   const reduced = usePrefersReducedMotion();
+  const inView = useRef(true);
+  const heroVisible = useHeroInView();
+  useEffect(() => {
+    inView.current = heroVisible;
+  }, [heroVisible]);
   const energy = useRef(0);
   const lastTyped = useRef(0);
   const characters = useRef(0);
@@ -238,6 +313,7 @@ export function useTypingSignal(): Signal {
 
     let nextDemoKey = 0;
     const interval = window.setInterval(() => {
+      if (!inView.current) return;
       const now = performance.now();
       const typing = now - lastTyped.current < IDLE_AFTER_MS;
 

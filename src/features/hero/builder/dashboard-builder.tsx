@@ -6,6 +6,7 @@ import {
   useId,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
@@ -344,7 +345,7 @@ function GridBoard({
         </div>
       ) : null}
 
-      {layout.map((item) => {
+      {layout.map((item, order) => {
         const size: Size = { w: item.w, h: item.h };
         const isDragging = drag?.id === item.id;
         const isResizing = resize?.id === item.id;
@@ -371,12 +372,16 @@ function GridBoard({
             aria-describedby={hintId}
             className={cn(
               cardClass,
-              "absolute left-0 top-0",
+              "hero-widget absolute left-0 top-0",
               isDragging && "z-30 cursor-grabbing border-ink shadow-[0_18px_40px_-12px_rgb(21_23_16/0.35)]",
               isResizing && "border-brand",
               isTarget && "border-brand ring-2 ring-brand/40",
             )}
-            style={{ zIndex: isDragging ? 30 : isResizing ? 20 : 1, touchAction: "pan-y" }}
+            style={{
+              zIndex: isDragging ? 30 : isResizing ? 20 : 1,
+              touchAction: "pan-y",
+              "--i": order,
+            } as CSSProperties}
             initial={false}
             animate={{
               x,
@@ -463,8 +468,8 @@ function ListCard({
       tabIndex={0}
       aria-label={widgetTitle(copy, id)}
       aria-describedby={hintId}
-      className={cn(cardClass, dragging && "z-30 border-ink shadow-[0_18px_40px_-12px_rgb(21_23_16/0.35)]")}
-      style={{ height: MOBILE_HEIGHT[id] }}
+      className={cn(cardClass, "hero-widget", dragging && "z-30 border-ink shadow-[0_18px_40px_-12px_rgb(21_23_16/0.35)]")}
+      style={{ height: MOBILE_HEIGHT[id], "--i": index } as CSSProperties}
       whileDrag={reduced ? undefined : { scale: 1.02, rotate: 1.2 }}
       transition={reduced ? { duration: 0 } : SPRING}
       onDragStart={() => setDragging(true)}

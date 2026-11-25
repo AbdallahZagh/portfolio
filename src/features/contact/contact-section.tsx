@@ -54,6 +54,7 @@ const breakable = (value: string) => value.replace(/\//g, "/\u200b");
 
 function CopyButton({ value, label, doneLabel }: { value: string; label: string; doneLabel: string }) {
   const [copied, setCopied] = useState(false);
+  const [touched, setTouched] = useState(false);
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
@@ -69,6 +70,7 @@ function CopyButton({ value, label, doneLabel }: { value: string; label: string;
       document.execCommand("copy");
       document.body.removeChild(area);
     }
+    setTouched(true);
     setCopied(true);
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => setCopied(false), 1600);
@@ -80,7 +82,11 @@ function CopyButton({ value, label, doneLabel }: { value: string; label: string;
       onClick={onCopy}
       className="inline-flex h-10 shrink-0 items-center rounded-full border border-contact-line px-[17px] text-[14px] font-semibold leading-[18px] text-contact-ink transition-colors duration-[var(--duration-hover)] hover:border-contact-accent hover:text-contact-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-contact-accent"
     >
-      <span aria-live="polite">{copied ? doneLabel : label}</span>
+      <span aria-live="polite">
+        <span key={String(copied)} className={touched ? "swap-in" : undefined}>
+          {copied ? doneLabel : label}
+        </span>
+      </span>
     </button>
   );
 }

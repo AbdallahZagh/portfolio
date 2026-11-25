@@ -204,7 +204,9 @@ body {
   background-color: var(--bg);
   color: var(--ink);
   font-family: var(--font-body);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color var(--duration-theme) var(--ease-standard),
+    color var(--duration-theme) var(--ease-standard);
   line-height: 1.65;
 }
 
@@ -317,13 +319,162 @@ svg {
   height: auto;
 }
 
+/* ---------------------------------------------------------------------------
+   Motion (Figma "Motion" table). Everything here is movement only: the
+   content is already painted and readable before any of it runs.
+   --------------------------------------------------------------------------- */
+
+@keyframes line-rise {
+  from {
+    transform: translateY(105%);
+  }
+}
+
+@keyframes rise {
+  from {
+    translate: 0 16px;
+  }
+}
+
+@keyframes drop {
+  from {
+    translate: 0 -12px;
+  }
+}
+
+@keyframes fill-up {
+  from {
+    height: 0;
+  }
+}
+
+@keyframes fill-across {
+  from {
+    width: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Headline: each line rises out of its own mask. */
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-block: 0.12em;
+  margin-block: -0.12em;
+}
+
+.line-rise {
+  display: block;
+  animation: line-rise var(--duration-reveal) var(--ease-out-expo) both;
+  animation-delay: calc(var(--hero-lines-at, 120ms) + var(--i, 0) * var(--duration-reveal-stagger));
+}
+
+/* The rest of the hero follows in order: --at is the start of each piece. */
+.hero-rise {
+  animation: rise var(--duration-reveal) var(--ease-out-expo) both;
+  animation-delay: var(--at, 0ms);
+}
+
+.nav-drop {
+  animation: drop var(--duration-reveal) var(--ease-out-expo) both;
+}
+
+/* Builder widgets arrive 120ms after the buttons, 60ms apart. */
+.hero-widget {
+  animation: rise var(--duration-reveal) var(--ease-out-expo) both;
+  animation-delay: calc(var(--hero-widgets-at, 560ms) + var(--i, 0) * 60ms);
+}
+
+/* Section head: settles 12px once, when it first scrolls into view. */
+[data-settle="pending"] {
+  translate: 0 12px;
+}
+
+[data-settle="done"] {
+  translate: 0 0;
+  transition: translate var(--duration-snap) var(--ease-spring-snap);
+}
+
+/* Copy -> Copied label swap. */
+.swap-in {
+  display: inline-block;
+  animation: fade-in var(--duration-hover) var(--ease-standard) both;
+}
+
+/* Tanks fill from empty, 80ms apart. */
+.tank-fill {
+  animation: fill-up 700ms var(--ease-out-expo) both;
+  animation-delay: calc(var(--i, 0) * 80ms);
+}
+
+.tube-fill {
+  animation: fill-across 700ms var(--ease-out-expo) both;
+  animation-delay: calc(var(--i, 0) * 80ms);
+}
+
+/* Theme change: a circle opens from the toggle (View Transitions API).
+   The browsers without it fall back to the body colour transition. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+}
+
+html.theme-switching body {
+  transition: none;
+}
+
+/* Reduced motion: no movement. Colour and opacity changes stay, short and linear. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 150ms !important;
+    transition-timing-function: linear !important;
     scroll-behavior: auto !important;
+  }
+
+  .line-rise,
+  .hero-rise,
+  .nav-drop,
+  .hero-widget {
+    animation: fade-in 150ms linear both;
+    animation-delay: 0ms;
+  }
+
+  .tank-fill,
+  .tube-fill {
+    animation: none;
+  }
+
+  [data-settle="pending"],
+  [data-settle="done"] {
+    translate: none;
+  }
+
+  [data-settle="pending"] {
+    opacity: 0.4;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: fade-in 150ms linear both;
+  }
+
+  ::view-transition-old(root) {
+    animation: none;
   }
 }

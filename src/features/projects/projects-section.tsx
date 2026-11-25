@@ -145,7 +145,7 @@ function Row({
           "group flex w-full cursor-pointer flex-col gap-2 rounded-lg px-4 py-5 text-start",
           "transition-[padding,background-color] duration-[var(--duration-row-indent)] ease-[var(--ease-standard)]",
           "active:bg-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-          "lg:flex-row lg:items-center lg:gap-0 lg:py-8 lg:hover:ps-10 lg:aria-expanded:ps-10",
+          "lg:flex-row lg:items-center lg:gap-0 lg:py-8 lg:hover:ps-10 lg:aria-expanded:ps-10 motion-reduce:lg:hover:ps-4 motion-reduce:lg:aria-expanded:ps-4",
         )}
       >
         <span className="hidden w-20 shrink-0 text-[18px] leading-[27px] text-muted lg:block">{row.index}</span>

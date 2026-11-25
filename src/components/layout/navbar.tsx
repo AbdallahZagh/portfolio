@@ -11,6 +11,7 @@ import { NavPillLink } from "@/components/ui/nav-pill-link";
 import { useLocale, type Locale } from "@/components/locale-provider";
 import { cn } from "@/lib/utils";
 import { useMounted } from "@/lib/use-mounted";
+import { changeTheme } from "@/lib/theme-transition";
 
 const NAV_OFFSET = -90;
 const SECTION_IDS = ["home", "experience", "projects", "skills", "contact"];
@@ -140,7 +141,7 @@ export function Navbar() {
       <header className="pointer-events-none fixed inset-x-0 top-0 z-40 bg-transparent px-4 pt-3 lg:px-8 lg:pt-4">
         <nav
           aria-label={locale === "ar" ? "التنقل الرئيسي" : "Primary"}
-          className="liquid-glass-pill pointer-events-auto relative mx-auto flex h-16 w-full max-w-[1328px] items-center justify-between rounded-full px-3 lg:h-[70px] lg:px-4"
+          className="nav-drop liquid-glass-pill pointer-events-auto relative mx-auto flex h-16 w-full max-w-[1328px] items-center justify-between rounded-full px-3 lg:h-[70px] lg:px-4"
         >
           <Monogram withName onClick={(event) => follow(event, "#home")} />
 
@@ -356,7 +357,7 @@ function ThemeSegment({ locale }: { locale: Locale }) {
   return (
     <Segment
       value={current}
-      onChange={(next) => setTheme(next)}
+      onChange={(next) => changeTheme(() => setTheme(next))}
       options={[
         { value: "light", label: text.light, icon: <Sun className="block size-[18px]" aria-hidden="true" /> },
         { value: "dark", label: text.dark, icon: <Moon className="block size-[18px]" aria-hidden="true" /> },
@@ -374,7 +375,9 @@ function ThemeIconButton({ className }: { className?: string }) {
     <IconButton
       className={className}
       aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
-      onClick={() => mounted && setTheme(isDark ? "light" : "dark")}
+      onClick={(event) =>
+        mounted && changeTheme(() => setTheme(isDark ? "light" : "dark"), event.currentTarget)
+      }
     >
       {isDark ? <Sun className="block size-5" /> : <Moon className="block size-5" />}
     </IconButton>

@@ -1,5 +1,6 @@
 "use client";
 
+import type * as React from "react";
 import { Download } from "lucide-react";
 import { Cta } from "@/components/ui/cta";
 import { useLocale } from "@/components/locale-provider";
@@ -18,7 +19,12 @@ export function HeroSection() {
     <section id="home" className="relative flex min-h-svh items-center">
       <div className="mx-auto grid w-full max-w-[1440px] items-center gap-12 px-5 py-28 sm:px-8 xl:grid-cols-[minmax(0,1fr)_536px] xl:gap-8 xl:px-14 xl:py-24">
         <div className="flex min-w-0 flex-col gap-6 md:gap-8">
-          <p className="text-[15px] font-medium leading-5 text-muted md:text-[16px]">{copy.role}</p>
+          <p
+            className="hero-rise text-[15px] font-medium leading-5 text-muted md:text-[16px]"
+            style={{ "--at": "60ms" } as React.CSSProperties}
+          >
+            {copy.role}
+          </p>
 
           <h1
             className={cn(
@@ -29,26 +35,20 @@ export function HeroSection() {
             )}
           >
             {lines.map((line, index) => {
-              if (index !== accent) {
-                return (
-                  <span key={line} className="block">
-                    {line}
-                  </span>
-                );
-              }
-              if (!accentWord) {
-                return (
-                  <span key={line} className="block text-brand-text">
-                    {line}
-                  </span>
-                );
-              }
-              const [before, after] = line.split(accentWord);
+              const tone = index === accent && !accentWord ? "text-brand-text" : undefined;
+              const [before, after] =
+                index === accent && accentWord ? line.split(accentWord) : [line, ""];
               return (
-                <span key={line} className="block">
-                  {before}
-                  <span className="text-brand-text">{accentWord}</span>
-                  {after}
+                <span key={line} className="line-mask">
+                  <span className={cn("line-rise", tone)} style={{ "--i": index } as React.CSSProperties}>
+                    {before}
+                    {index === accent && accentWord ? (
+                      <>
+                        <span className="text-brand-text">{accentWord}</span>
+                        {after}
+                      </>
+                    ) : null}
+                  </span>
                 </span>
               );
             })}
@@ -56,16 +56,20 @@ export function HeroSection() {
 
           <p
             className={cn(
-              "max-w-[560px] text-[18px] leading-[27px] text-muted md:text-[20px]",
+              "hero-rise max-w-[560px] text-[18px] leading-[27px] text-muted md:text-[20px]",
               isRtl && "md:leading-[30px]",
             )}
+            style={{ "--at": "360ms" } as React.CSSProperties}
           >
             <span className="font-medium text-ink">{copy.leadStrong}</span>
             <span className="xl:hidden">{copy.leadRestMobile}</span>
             <span className="hidden xl:inline">{copy.leadRest}</span>
           </p>
 
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-4 md:gap-x-8">
+          <div
+            className="hero-rise flex flex-wrap items-center gap-x-6 gap-y-4 md:gap-x-8"
+            style={{ "--at": "440ms" } as React.CSSProperties}
+          >
             <Cta href="#contact" size="responsive">
               {copy.talk}
             </Cta>

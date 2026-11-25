@@ -46,7 +46,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const resolved = variant === "secondary" ? "primary" : variant;
     const classes = cn(
-      "inline-flex items-center justify-center gap-2 rounded-full px-5 font-semibold leading-none transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)] disabled:pointer-events-none",
+      "inline-flex items-center justify-center gap-2 rounded-full px-5 font-semibold leading-none transition-[color,background-color,border-color,transform] duration-[var(--duration-hover)] ease-[var(--ease-standard)] active:scale-[0.98] motion-reduce:active:scale-100 disabled:pointer-events-none",
       focusRing,
       {
         "bg-brand text-on-brand hover:bg-brand-hover active:bg-brand-press disabled:bg-disabled-bg disabled:text-disabled-fg":

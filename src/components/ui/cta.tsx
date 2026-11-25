@@ -18,8 +18,8 @@ const Cta = React.forwardRef<HTMLAnchorElement, CtaProps>(
         ref={ref}
         className={cn(
           "inline-flex items-center justify-between gap-3 rounded-full bg-brand text-[17px] font-semibold leading-5 text-on-brand",
-          "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)]",
-          "hover:bg-brand-hover active:bg-brand-press",
+          "transition-[color,background-color,transform] duration-[var(--duration-hover)] ease-[var(--ease-standard)]",
+          "hover:bg-brand-hover active:scale-[0.98] active:bg-brand-press motion-reduce:active:scale-100",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
           size === "md" && "h-11 ps-4 pe-2",
           size === "lg" && "h-14 ps-6 pe-2",

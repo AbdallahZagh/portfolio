@@ -7,6 +7,7 @@ import type { Size, WidgetId } from "./layout";
 import {
   SCOPE_SAMPLES,
   formatClock,
+  useCountUp,
   useReactor,
   useTelemetry,
   useTypingSignal,
@@ -241,7 +242,7 @@ function TelemetryWidget({ copy }: WidgetProps) {
 // Stack tanks
 // ---------------------------------------------------------------------------
 
-function Tube({ value, empty }: { value: number | null; empty?: boolean }) {
+function Tube({ value, empty, index = 0 }: { value: number | null; empty?: boolean; index?: number }) {
   return (
     <span
       aria-hidden="true"
@@ -252,8 +253,8 @@ function Tube({ value, empty }: { value: number | null; empty?: boolean }) {
     >
       {value === null ? null : (
         <span
-          className="absolute inset-y-[2px] start-[2px] rounded-full bg-brand"
-          style={{ width: `calc(${value}% - 4px)` }}
+          className="tube-fill absolute inset-y-[2px] start-[2px] rounded-full bg-brand"
+          style={{ width: `calc(${value}% - 4px)`, "--i": index } as React.CSSProperties}
         >
           <span className="absolute inset-x-1.5 top-[1px] h-px rounded-full bg-white/50" />
         </span>
@@ -270,9 +271,11 @@ function Capsule({
   sloshing,
   reduced,
   loading,
+  index,
 }: {
   label: string;
   value: number;
+  index: number;
   sloshing: boolean;
   reduced: boolean;
   loading: boolean;
@@ -285,8 +288,8 @@ function Capsule({
       >
         {loading ? null : (
           <div
-            className="absolute inset-x-0 bottom-0 bg-brand transition-[height] duration-[var(--duration-snap)] ease-[var(--ease-out-expo)]"
-            style={{ height: `${value}%` }}
+            className="tank-fill absolute inset-x-0 bottom-0 bg-brand transition-[height] duration-[var(--duration-snap)] ease-[var(--ease-out-expo)]"
+            style={{ height: `${value}%`, "--i": index } as React.CSSProperties}
           >
             <svg
               viewBox="0 0 120 16"
@@ -329,9 +332,10 @@ function TanksWidget({ copy, size, dragging }: WidgetProps) {
       <Head title={text.title} status={status} tone={mounted && !reduced ? "live" : "idle"} />
       {capsules ? (
         <div className="mt-2 flex min-h-0 flex-1 gap-2">
-          {text.items.map((item) => (
+          {text.items.map((item, index) => (
             <Capsule
               key={item.label}
+              index={index}
               label={item.short}
               value={item.value}
               sloshing={dragging}
@@ -342,10 +346,10 @@ function TanksWidget({ copy, size, dragging }: WidgetProps) {
         </div>
       ) : (
         <ul className="mt-2 space-y-1">
-          {text.items.map((item) => (
+          {text.items.map((item, index) => (
             <li key={item.label} className="flex h-4 items-center gap-2 text-[12px] font-medium leading-4">
               <span className="w-[44px] shrink-0 truncate text-muted">{item.label}</span>
-              <Tube value={mounted ? item.value : null} empty={!mounted} />
+              <Tube value={mounted ? item.value : null} empty={!mounted} index={index} />
               <span className="w-9 shrink-0 text-end font-mono text-[13px] text-ink" dir="ltr">
                 {mounted ? `${item.value}%` : "…"}
               </span>
@@ -398,7 +402,8 @@ function VitalsWidget({ copy, size }: WidgetProps) {
           ? copy.status.live
           : copy.status.thisPage;
 
-  const lcpValue = lcp === undefined ? "—" : `${lcp.toFixed(1)} s`;
+  const lcpShown = useCountUp(lcp, 900);
+  const lcpValue = lcpShown === undefined ? "—" : `${lcpShown.toFixed(1)} s`;
   const cls = vitals.cls === undefined ? "—" : vitals.cls.toFixed(2);
   const inp = vitals.inp === undefined ? "—" : `${Math.round(vitals.inp)} ms`;
 
@@ -481,7 +486,7 @@ function Core({ pulsing, className }: { pulsing: boolean; className?: string }) 
       className={cn("shrink-0", className)}
       aria-hidden="true"
       animate={pulsing ? { scale: [1, 1.07, 1] } : { scale: 1 }}
-      transition={pulsing ? { duration: 0.7, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
+      transition={pulsing ? { duration: 0.42, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
     >
       <circle cx="50" cy="50" r="48" fill="none" className="stroke-brand" strokeWidth="1.5" />
       <circle cx="50" cy="50" r="39.5" fill="none" className="stroke-brand" strokeWidth="1.5" />
