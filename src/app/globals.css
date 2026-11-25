@@ -31,6 +31,15 @@
   --color-glass-active: var(--glass-active);
   --color-glass-stroke: var(--glass-stroke);
   --color-glass-fill-strong: var(--glass-fill-strong);
+  --color-contact-bg: var(--contact-bg);
+  --color-contact-line: var(--contact-line);
+  --color-contact-border: var(--contact-border);
+  --color-contact-ink: var(--contact-ink);
+  --color-contact-muted: var(--contact-muted);
+  --color-contact-accent: var(--contact-accent);
+  --color-contact-btn: var(--contact-btn);
+  --color-contact-btn-fg: var(--contact-btn-fg);
+  --color-contact-error: var(--contact-error);
 
   /* Existing utilities resolve to the Figma palette until each section is rebuilt. */
   --color-background: var(--bg);
@@ -47,7 +56,8 @@
   --font-display: var(--font-host-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-host-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
-  --font-arabic: var(--font-noto-sans-arabic), var(--font-host-grotesk), sans-serif;
+  /* Host Grotesk first so Latin text (names, emails, numbers) keeps the Figma face; it has no Arabic glyphs, so Arabic falls through to Noto. */
+  --font-arabic: var(--font-host-grotesk), var(--font-noto-sans-arabic), sans-serif;
 }
 
 :root {
@@ -123,6 +133,16 @@
   --glass-active: #ffffffb3;
   --glass-stroke: #ffffffe6;
   --glass-fill-strong: #ffffff52;
+  /* Contact block: a dark card in both themes (Figma "Contact block"). */
+  --contact-bg: #151710;
+  --contact-line: #5b5e52;
+  --contact-border: transparent;
+  --contact-ink: #f3f2ec;
+  --contact-muted: #dcdcd0;
+  --contact-accent: #e4e8d3;
+  --contact-btn: #55652a;
+  --contact-btn-fg: #ffffff;
+  --contact-error: #f6e0b5;
 }
 
 [data-theme="dark"] {
@@ -153,6 +173,15 @@
   --glass-active: #ffffff1f;
   --glass-stroke: #ffffff33;
   --glass-fill-strong: #1a1c1673;
+  --contact-bg: #1a1c16;
+  --contact-line: #2b2e24;
+  --contact-border: #2b2e24;
+  --contact-ink: #edeee6;
+  --contact-muted: #9ea192;
+  --contact-accent: #a9bc6a;
+  --contact-btn: #a9bc6a;
+  --contact-btn-fg: #11120e;
+  --contact-error: #f0d5a0;
 }
 
 html {
