@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ContactForm } from "./contact-form";
 import { Container } from "@/components/ui/container";
 import { useLocale, type Locale } from "@/components/locale-provider";
-import { site, socialLinks } from "@/data/portfolio";
+import { ltr, site, socialLinks } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 
 type ContactCopy = {
@@ -42,7 +42,7 @@ const copy: Record<Locale, ContactCopy> = {
     github: "GitHub",
     linkedin: "LinkedIn",
     basedIn: "المقر",
-    basedInValue: "دمشق · UTC+3 · عن بُعد من أي مكان",
+    basedInValue: `دمشق · ${ltr("UTC+3")} · عن بُعد من أي مكان`,
     arrow: "↖",
   },
 };

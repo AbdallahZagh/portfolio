@@ -36,13 +36,11 @@ const copy: Record<
   },
   ar: {
     title: "المشاريع",
-    // AR? aside rewritten from the CV (the Figma aside mentions a project the CV no longer lists)
     aside:
-      "يتصدّرها Nova الذي بنيتُه بمفردي للويب والجوال وWindows وAPI، إضافةً إلى نظام ERP جامعي على Odoo، وFigma MCP Bridge، ولوحات العيادات وواجهة متجر إلكتروني.",
+      "يتصدّرها Nova الذي بنيتُه بمفردي للويب والجوال وWindows وAPI، إضافةً إلى نظام ERP جامعي على Odoo وFigma MCP Bridge وأعمال سابقة في لوحات العيادات والتجارة الإلكترونية.",
     demo: "عرض مباشر",
     github: "GitHub",
-    // AR? not in Figma
-    gallery: "لقطات من Nova",
+    gallery: "لقطات شاشة من Nova",
     whatItDoes: "ما يفعله",
     whatIBuilt: "ما بنيتُه",
   },
@@ -88,7 +86,13 @@ function FeaturedProject({ text }: { text: (typeof copy)[Locale] }) {
           ))}
         </ul>
         <div className="pt-2">
-          <Button href={project.demoHref} target="_blank" rel="noopener noreferrer" size="sm">
+          <Button
+            href={project.demoHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            size="sm"
+            aria-label={`${text.demo}: Nova`}
+          >
             {text.demo}
             <ExternalArrow />
           </Button>

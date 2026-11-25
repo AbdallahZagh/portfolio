@@ -36,9 +36,9 @@ const jetbrainsMono = JetBrains_Mono({
   adjustFontFallback: true,
 });
 
-const title = "Abdallah Zaghloul | Frontend Engineer & Technical Lead (React / Next.js)";
+const title = "Abdallah Zaghloul — Frontend Engineer & Technical Lead";
 const description =
-  "Frontend engineer and technical lead with 4+ years building production web applications in React, Next.js and TypeScript. Available for worldwide remote opportunities.";
+  "Frontend Engineer & Technical Lead (React, Next.js, TypeScript) with 4+ years building real-time dashboards, interactive builders and RTL web apps.";
 const ogImage = publicAsset("/og-image.png");
 
 export const metadata: Metadata = {

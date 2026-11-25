@@ -14,19 +14,17 @@ const copy: Record<
   en: {
     title: "Experience",
     aside:
-      "Technical lead at Elathr Business, IoT and fire-safety platforms at Sama-Tech, Odoo ERP and web apps as a software developer, and frontend leadership at PawsPalConnect.",
+      "Technical lead at Elathr Business, IoT and fire-safety platforms at Sama-Tech, Odoo ERP and web apps as a freelance software developer, and frontend leadership at PawsPalConnect.",
     certificate: "Internship certificate",
     dialog: "Internship certificate",
     close: "Close",
   },
   ar: {
     title: "الخبرة",
-    // AR? aside follows the CV facts (the Figma Arabic aside mentions "freelance", which the CV no longer says)
     aside:
-      "قائد تقني في Elathr Business، ومنصات IoT والسلامة من الحرائق في Sama-Tech، وأنظمة Odoo ERP وتطبيقات ويب كمطوّر برمجيات، وقيادة الواجهات الأمامية في PawsPalConnect.",
+      "قيادة تقنية في Elathr Business، ومنصات IoT والسلامة من الحرائق في Sama-Tech، ونظام Odoo ERP وتطبيقات ويب كمطوّر مستقل، وقيادة الواجهات الأمامية في PawsPalConnect.",
     certificate: "شهادة التدريب",
-    // AR? not in Figma
-    dialog: "شهادة التدريب",
+    dialog: "شهادة إتمام التدريب",
     close: "إغلاق",
   },
 };
@@ -79,7 +77,7 @@ export function ExperienceSection() {
                 {job.certificate ? (
                   <CertificatePreview
                     src={job.certificate.src}
-                    alt={job.certificate.alt}
+                    alt={job.certificate.alt[locale]}
                     label={text.certificate}
                     dialogTitle={text.dialog}
                     closeLabel={text.close}

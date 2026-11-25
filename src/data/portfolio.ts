@@ -3,9 +3,13 @@ import { Github, Linkedin } from "lucide-react";
 
 /**
  * All site content. Source: ABDALLAH_ZAGHLOUL_Resume_2026-11-25.pdf.
- * English wording is verbatim from the CV. Arabic strings are proposed translations and need
- * the owner's approval before shipping (everything marked "ar" below unless it comes from Figma).
+ * English wording follows the CV. Arabic strings were reviewed and revised in the v3 content review
+ * (portfolio-v3-final.md). Dates and Latin tokens inside Arabic text go through `ltr()` so the
+ * slash, plus and dash never flip in right-to-left lines.
  */
+
+/** Isolates a left-to-right run (dates, UTC+3) inside Arabic text. */
+export const ltr = (text: string) => `\u2066${text}\u2069`;
 
 /** A value in both site languages. */
 export type Localized<T = string> = { en: T; ar: T };
@@ -63,7 +67,7 @@ export type Experience = {
   tags: Localized<string[]>;
   /** CV bullets, verbatim in English. */
   bullets: Localized<string[]>;
-  certificate?: { src: string; alt: string };
+  certificate?: { src: string; alt: Localized };
 };
 
 /** Newest first, as in the CV. */
@@ -71,11 +75,11 @@ export const experiences: Experience[] = [
   {
     id: "elathr",
     title: { en: "Technical Lead", ar: "قائد تقني" },
-    company: { en: "Elathr Business · Remote", ar: "Elathr Business · عن بُعد" },
-    period: { en: "10/2026 – Present", ar: "10/2026 – الآن" },
+    company: { en: "Elathr Business · Remote (Contract)", ar: "Elathr Business · عن بُعد (عقد)" },
+    period: { en: "10/2026 – Present", ar: `${ltr("10/2026")} – حتى الآن` },
     tags: {
       en: ["Vendor delivery", "Requirements", "Sprint QA"],
-      ar: ["تسليم المزوّد", "المتطلبات", "اختبار السبرنت"],
+      ar: ["تسليم المزوّدين", "المتطلبات", "ضمان جودة السبرنت"],
     },
     bullets: {
       en: [
@@ -96,9 +100,9 @@ export const experiences: Experience[] = [
   },
   {
     id: "sama-tech",
-    title: { en: "Frontend Web Developer", ar: "مطوّر واجهات ويب أمامية" },
+    title: { en: "Frontend Engineer", ar: "مهندس واجهات أمامية" },
     company: { en: "Sama-Tech", ar: "Sama-Tech" },
-    period: { en: "03/2026 – Present", ar: "03/2026 – الآن" },
+    period: { en: "03/2026 – Present", ar: `${ltr("03/2026")} – حتى الآن` },
     tags: {
       en: ["React 19", "Next.js 16", "Socket.IO", "Mapbox GL"],
       ar: ["React 19", "Next.js 16", "Socket.IO", "Mapbox GL"],
@@ -113,19 +117,20 @@ export const experiences: Experience[] = [
         "Built the company website in Next.js 16 and React 19: 25 pages covering company platforms, product pages and blog, with scroll-driven animation in GSAP and Framer Motion.",
       ],
       ar: [
-        "بنيتُ بمفردي IoT Platform v2، إعادة بناء كاملة من الصفر للوحة تحكم IoT القديمة باستخدام React 19 وVite وTypeScript وTailwind v4 وZustand وTanStack Query، انطلاقًا من الواجهة الأمامية القديمة وحدها ودون دعم من خلفية أو فريق.",
+        "بنيتُ بمفردي IoT Platform v2، إعادة بناء كاملة من الصفر للوحة تحكم IoT القديمة باستخدام React 19 وVite وTypeScript وTailwind v4 وZustand وTanStack Query، اعتمادًا على الواجهة الأمامية القديمة وحدها، دون فريق أو دعم من مطوّري الخلفية.",
         "بنيتُ أداة لبناء لوحات التحكم بالسحب والإفلات تضم أكثر من 30 نوعًا قابلًا للضبط من الودجات (مقاييس ومخططات وجداول ومفاتيح ومنزلقات وخزانات/أنابيب/مضخات وبثّ مباشر للكاميرات) مع إعدادات بمعاينة حيّة.",
         "أنجزتُ أكثر من 20 وحدة IoT، مع بيانات لحظية عبر Socket.IO وخرائط Mapbox GL وStripe والعربية/الإنجليزية/الأردية مع RTL واختبارات Vitest وPlaywright.",
         "بنيتُ منصة Sama Fire لمراقبة السلامة من الحرائق بـ React 19 وVite، وتشمل المواقع والمباني والطوابق والبوابات ولوحات الحريق والأحداث والحوادث المباشرة والصيانة والكاميرات والأصول والاشتراكات ولوحة Super Admin.",
         "أنشأتُ محرر مخططات طوابق بالسحب والإفلات يضع الأصول ولوحات الحريق على مخططات المباني، وربطتُ الإنذارات المباشرة عبر Socket.IO وإشعارات Firebase (بما فيها الإشعارات في الخلفية)، مع صلاحيات وصول ودعم العربية/الإنجليزية/الأردية بـ RTL.",
-        "بنيتُ موقع الشركة بـ Next.js 16 وReact 19: 25 صفحة عن منصات الشركة وصفحات المنتجات والمدونة، مع حركة مرتبطة بالتمرير بـ GSAP وFramer Motion.",
+        "بنيتُ موقع الشركة بـ Next.js 16 وReact 19: 25 صفحة تغطي منصات الشركة ومنتجاتها ومدونتها، مع حركات مرتبطة بالتمرير بـ GSAP وFramer Motion.",
       ],
     },
   },
   {
     id: "software-developer",
     title: { en: "Software Developer", ar: "مطوّر برمجيات" },
-    period: { en: "2023 – Present", ar: "2023 – الآن" },
+    company: { en: "Freelance", ar: "عمل حر" },
+    period: { en: "2023 – Present", ar: `${ltr("2023")} – حتى الآن` },
     tags: {
       en: ["Odoo", "React", "Performance"],
       ar: ["Odoo", "React", "الأداء"],
@@ -151,7 +156,7 @@ export const experiences: Experience[] = [
     id: "pawspalconnect",
     title: { en: "Frontend Team Lead (Internship)", ar: "قائد فريق الواجهات الأمامية (تدريب)" },
     company: { en: "PawsPalConnect", ar: "PawsPalConnect" },
-    period: { en: "10/2025 – 02/2026", ar: "10/2025 – 02/2026" },
+    period: { en: "10/2025 – 02/2026", ar: ltr("10/2025 – 02/2026") },
     tags: {
       en: ["React 19", "Redux Toolkit", "Team lead"],
       ar: ["React 19", "Redux Toolkit", "قيادة الفريق"],
@@ -166,22 +171,25 @@ export const experiences: Experience[] = [
       ],
       ar: [
         "قدتُ فريق واجهات أمامية من 3 أشخاص ووجّهته: القرارات التقنية والمراجعات والتسليم.",
-        "صمّمتُ معماريًا منصة رعاية حيوانات أليفة جاهزة للإنتاج باستخدام React 19 وRedux Toolkit، فنتجت قاعدة شيفرة عالية القابلية للتوسع والصيانة.",
+        "صمّمتُ البنية المعمارية لمنصة رعاية حيوانات أليفة جاهزة للإنتاج باستخدام React 19 وRedux Toolkit، مما أثمر قاعدة شيفرة قابلة للتوسع وسهلة الصيانة.",
         "طوّرتُ ميزات معقدة منها حجز المواعيد ومتابعة التطعيمات ولوحة تحكم لمتجر إلكتروني.",
         "نفّذتُ نظام تصميم حديثًا ومتجاوبًا بـ Tailwind CSS v4 قلّل الدين التقني في CSS.",
-        "دمجتُ تصوير بيانات لحظيًا بـ Chart.js وRecharts لرؤى تشغيلية.",
+        "دمجتُ رسومًا بيانية لحظية باستخدام Chart.js وRecharts لعرض المؤشرات التشغيلية.",
       ],
     },
     certificate: {
       src: "/ppc-certificate.png",
-      alt: "Internship completion certificate — Paws Pal Connect (NPT Solutions), Front-End Team Lead Intern, Abdallah Zaghloul, October 2025 to February 2026",
+      alt: {
+        en: "Internship completion certificate — Paws Pal Connect (NPT Solutions), Front-End Team Lead Intern, Abdallah Zaghloul, October 2025 to February 2026",
+        ar: "شهادة إتمام التدريب — Paws Pal Connect (NPT Solutions)، متدرّب قائد فريق الواجهات الأمامية، عبدالله زغلول، من أكتوبر 2025 إلى فبراير 2026",
+      },
     },
   },
   {
     id: "goma",
     title: { en: "Frontend Web Developer", ar: "مطوّر واجهات ويب أمامية" },
     company: { en: "Goma+", ar: "Goma+" },
-    period: { en: "11/2022 – 11/2023", ar: "11/2022 – 11/2023" },
+    period: { en: "11/2022 – 11/2023", ar: ltr("11/2022 – 11/2023") },
     tags: {
       en: ["React", "Tailwind CSS"],
       ar: ["React", "Tailwind CSS"],
@@ -193,7 +201,7 @@ export const experiences: Experience[] = [
       ],
       ar: [
         "بنيتُ واجهات React وTailwind متجاوبة ضمن فريق متعدد التخصصات.",
-        "صنتُ واجهات الإنتاج وأصلحتُ مشكلات الأداء التي كانت وراء بلاغات الأخطاء.",
+        "تولّيتُ صيانة واجهات الإنتاج وأصلحتُ مشكلات الأداء التي كانت وراء بلاغات الأخطاء.",
       ],
     },
   },
@@ -217,7 +225,7 @@ export type FeaturedProject = {
   demoHref: string;
 };
 
-export type ProjectImage = { src: string; alt: string; width: number; height: number };
+export type ProjectImage = { src: string; alt: Localized; width: number; height: number };
 
 export const featuredProject: FeaturedProject = {
   id: "nova",
@@ -244,20 +252,29 @@ export const featuredProject: FeaturedProject = {
   tags: ["Next.js 16", "Expo", "WinUI 3", "NestJS 11"],
   image: {
     src: "/nova-screenshot.png",
-    alt: "Nova task board: the Aurora Launch project with To Do, In Progress, In Review and Completed columns",
+    alt: {
+      en: "Nova task board: the Aurora Launch project with To Do, In Progress, In Review and Completed columns",
+      ar: "لوحة مهام Nova: مشروع Aurora Launch بأعمدة للمهام المطلوبة وقيد التنفيذ وقيد المراجعة والمكتملة",
+    },
     width: 1248,
     height: 672,
   },
   sideImages: {
     left: {
       src: "/nova-light.png",
-      alt: "Nova dashboard in light mode, showing the last project, last whiteboard and tasks due today",
+      alt: {
+        en: "Nova dashboard in light mode, showing the last project, last whiteboard and tasks due today",
+        ar: "لوحة Nova في الوضع الفاتح تعرض آخر مشروع وآخر سبورة والمهام المستحقة اليوم",
+      },
       width: 1077,
       height: 580,
     },
     right: {
       src: "/nova-timeline.png",
-      alt: "Nova timeline calendar with tasks and subscription charges colour-coded by status",
+      alt: {
+        en: "Nova timeline calendar with tasks and subscription charges color-coded by status",
+        ar: "التقويم الزمني في Nova مع المهام ورسوم الاشتراكات ملوّنة حسب الحالة",
+      },
       width: 1077,
       height: 580,
     },
@@ -288,11 +305,10 @@ export const projectRows: ProjectRow[] = [
     title: { en: "Meeting ERP", ar: "Meeting ERP" },
     category: {
       en: "University housing & hospitality ERP",
-      ar: "ERP للسكن الجامعي والضيافة",
+      ar: "نظام ERP للسكن الجامعي والضيافة",
     },
     description: {
       en: "A bilingual (Arabic/English) ERP for a university's student housing and hospitality, built on Odoo Community 20 with a Flutter app for residents. A team project that I co-developed.",
-      // AR? proposed translation
       ar: "نظام ERP ثنائي اللغة (العربية/الإنجليزية) للسكن الجامعي والضيافة، مبني على Odoo Community 20 مع تطبيق Flutter للمقيمين. مشروع فريق شاركتُ في تطويره.",
     },
     bullets: {
@@ -316,8 +332,8 @@ export const projectRows: ProjectRow[] = [
         "Purchase receipts with barcode search, damage incidents and Arabic translations.",
       ],
       ar: [
-        "مكتب الكاشير ومدفوعات محفظة نقطة البيع، مع التحقق من الدفع مغطى باختبارات انحدار.",
-        "تسعير المغسلة، وسير عمل مخزون المستهلكات، وإتلاف المستودعات.",
+        "مكتب الكاشير ومدفوعات محفظة نقطة البيع، مع التحقق من الدفع مغطّى باختبارات التراجع.",
+        "تسعير المغسلة، وسير عمل مخزون المستهلكات، وإتلاف مخزون المستودعات.",
         "إيصالات الشراء مع البحث بالباركود، وحوادث التلف، والترجمات العربية.",
       ],
     },
@@ -329,9 +345,8 @@ export const projectRows: ProjectRow[] = [
     title: { en: "Figma MCP Bridge", ar: "Figma MCP Bridge" },
     category: { en: "MCP server and Figma plugin", ar: "خادم MCP وإضافة Figma" },
     description: {
-      en: "An open-source bridge that lets local AI agents read and edit live Figma files through the Model Context Protocol. I built both halves: an MCP server and a Figma Desktop plugin, connected over a local WebSocket.",
-      // AR? proposed translation
-      ar: "جسر مفتوح المصدر يتيح لوكلاء الذكاء الاصطناعي المحليين قراءة ملفات Figma الحيّة وتعديلها عبر Model Context Protocol. بنيتُ الجزأين: خادم MCP وإضافة Figma Desktop، متصلين عبر WebSocket محلي.",
+      en: "A bridge that lets local AI agents read and edit live Figma files through the Model Context Protocol. I built both halves: an MCP server and a Figma Desktop plugin, connected over a local WebSocket.",
+      ar: "جسر يتيح لوكلاء الذكاء الاصطناعي المحليين قراءة ملفات Figma الحيّة وتعديلها عبر Model Context Protocol. بنيتُ الجزأين: خادم MCP وإضافة Figma Desktop، متصلين عبر WebSocket محلي.",
     },
     bullets: {
       en: [
@@ -344,7 +359,7 @@ export const projectRows: ProjectRow[] = [
         "إنشاء العقد وتعديلها: الإطارات والنصوص والتخطيط التلقائي وتعبئات SVG والصور، مع أدوات بحث وتحديد ليجد الوكيل ما يحتاجه.",
         "أدوات نظام التصميم: المكوّنات والنُّسخ (إنشاء واستبدال وفصل)، ومجموعات المتغيّرات بوضعين فاتح وداكن، وربط المتغيّرات.",
         "أدوات النماذج التفاعلية: تفاعلات النقر مع Smart Animate، ونقطة بداية للمسار، وتصدير أي عقدة إلى PNG أو JPG أو SVG أو PDF.",
-        "نقطة HTTP مباشرة إلى جانب MCP، لتتحكم السكربتات في Figma دون عميل ذكاء اصطناعي.",
+        "واجهة HTTP مباشرة إلى جانب MCP، لتتحكم السكربتات في Figma دون عميل ذكاء اصطناعي.",
       ],
     },
     tags: ["MCP", "Figma Plugin API", "WebSocket", "Node.js"],
@@ -356,7 +371,6 @@ export const projectRows: ProjectRow[] = [
     category: { en: "Administrative & Doctor Dashboards", ar: "لوحات الإدارة والأطباء" },
     description: {
       en: "Administrative and doctor dashboards for a medical clinic, built around the daily work of appointments and patient records. I was the frontend engineer.",
-      // AR? proposed translation
       ar: "لوحتا إدارة وأطباء لعيادة طبية، مبنيتان حول العمل اليومي للمواعيد وسجلات المرضى. كنتُ مهندس الواجهة الأمامية.",
     },
     bullets: {
@@ -366,7 +380,7 @@ export const projectRows: ProjectRow[] = [
       ],
       ar: [
         "صمّمتُ لوحتي الإدارة والأطباء مع التركيز على كفاءة سير العمل.",
-        "نفّذتُ دعم تعدد اللغات (i18n) لتلبية عمليات العيادات الدولية.",
+        "نفّذتُ دعم تعدد اللغات (i18n) بما يناسب عمليات العيادات الدولية.",
       ],
     },
     tags: ["React", "Redux Toolkit", "Tailwind CSS", "i18next", "Axios"],
@@ -378,14 +392,13 @@ export const projectRows: ProjectRow[] = [
     category: { en: "Real-time cart state", ar: "حالة سلة لحظية" },
     description: {
       en: "A storefront frontend built for speed, where the cart stays in sync everywhere in the app as shoppers add and change items. I was the frontend engineer.",
-      // AR? proposed translation
       ar: "واجهة أمامية لمتجر إلكتروني مبنية للسرعة، تبقى فيها السلة متزامنة في كل أنحاء التطبيق أثناء إضافة المتسوّق للمنتجات وتعديلها. كنتُ مهندس الواجهة الأمامية.",
     },
     bullets: {
       en: [
         "Developed a high-performance frontend with real-time state synchronization for cart management.",
       ],
-      ar: ["طوّرتُ واجهة أمامية عالية الأداء مع مزامنة لحظية للحالة لإدارة سلة التسوق."],
+      ar: ["طوّرتُ واجهة أمامية عالية الأداء مع مزامنة لحظية لحالة سلة التسوق."],
     },
     tags: ["React", "Redux", "Tailwind CSS", "Chart.js", "Recharts"],
   },
@@ -433,7 +446,7 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     id: "backend",
-    label: { en: "Backend & data", ar: "الواجهة الخلفية والبيانات" },
+    label: { en: "Backend & data", ar: "الخلفية والبيانات" },
     items: [
       "NestJS",
       "Prisma",
@@ -460,7 +473,7 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     id: "3d-maps-realtime",
-    label: { en: "3D, Maps & Real-time", ar: "ثلاثي الأبعاد والخرائط والوقت الحقيقي" },
+    label: { en: "3D, Maps & Real-time", ar: "الرسوم ثلاثية الأبعاد والخرائط والبيانات اللحظية" },
     items: ["Socket.IO", "Supabase Realtime", "Mapbox GL", "Three.js"],
   },
   {
@@ -491,7 +504,7 @@ export const education = {
   label: { en: "Education", ar: "التعليم" } as Localized,
   value: {
     en: "BSc in Information Technology (AI Specialization), Al-Sham Private University · 03/2025",
-    ar: "بكالوريوس تقنية المعلومات (تخصص الذكاء الاصطناعي)، جامعة الشام الخاصة · 03/2025",
+    ar: `بكالوريوس تقنية المعلومات (تخصص الذكاء الاصطناعي)، جامعة الشام الخاصة · ${ltr("03/2025")}`,
   } as Localized,
 };
 

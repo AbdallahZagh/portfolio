@@ -71,6 +71,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           target={target}
           rel={rel}
           download={download}
+          aria-label={props["aria-label"]}
           className={classes}
           ref={ref as React.Ref<HTMLAnchorElement>}
         >

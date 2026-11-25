@@ -10,7 +10,7 @@ const copy: Record<Locale, { rights: string; links: { href: string; label: strin
       { href: "#experience", label: "Experience" },
       { href: "#projects", label: "Projects" },
       { href: "#skills", label: "Skills" },
-      { href: "#contact", label: "Let's talk" },
+      { href: "#contact", label: "Get in touch" },
     ],
   },
   ar: {
@@ -19,7 +19,7 @@ const copy: Record<Locale, { rights: string; links: { href: string; label: strin
       { href: "#experience", label: "الخبرة" },
       { href: "#projects", label: "المشاريع" },
       { href: "#skills", label: "المهارات" },
-      { href: "#contact", label: "لنتحدث" },
+      { href: "#contact", label: "تواصل معي" },
     ],
   },
 };
@@ -32,7 +32,7 @@ export function Footer() {
     <footer>
       <Container className="flex flex-col gap-2 pb-6 pt-6 md:h-[92px] md:flex-row md:items-center md:justify-between md:py-0">
         <p className="text-[15px] font-medium leading-5 text-muted">{text.rights}</p>
-        <nav aria-label="Footer" className="flex flex-wrap gap-x-6">
+        <nav aria-label={locale === "ar" ? "التذييل" : "Footer"} className="flex flex-wrap gap-x-6">
           {text.links.map((link) => (
             <a
               key={link.href}

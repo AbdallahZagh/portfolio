@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
+import { useLocale } from "@/components/locale-provider";
 import type { ProjectImage } from "@/data/portfolio";
 import { publicAsset } from "@/lib/public-asset";
 import { cn } from "@/lib/utils";
@@ -31,6 +32,7 @@ export function NovaGallery({
   right: ProjectImage;
   label: string;
 }) {
+  const { locale } = useLocale();
   const [front, setFront] = useState<Slot | null>(null);
   const images: Record<Slot, ProjectImage> = { left, main, right };
   const order: Slot[] = ["left", "right", "main"];
@@ -81,7 +83,7 @@ export function NovaGallery({
             {/* eslint-disable-next-line @next/next/no-img-element -- publicAsset path must match basePath; Next Image loader differs for static export */}
             <img
               src={publicAsset(images[slot].src)}
-              alt={images[slot].alt}
+              alt={images[slot].alt[locale]}
               width={images[slot].width}
               height={images[slot].height}
               loading={slot === "main" ? "eager" : "lazy"}

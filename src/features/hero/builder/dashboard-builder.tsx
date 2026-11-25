@@ -252,14 +252,14 @@ function GridBoard({
       if (!sameLayout(next, items)) {
         committed = next;
         setItems(next);
-        announce(`${widgetTitle(copy, current.id)} ${copy.builder.moved}`);
+        announce(`${widgetTitle(copy, current.id)}: ${copy.builder.moved}`);
       }
     } else if (current.kind === "resize" && !cancelled && resize) {
       const next = resizeTo(items, resize.id, resize.size);
       if (!sameLayout(next, items)) {
         committed = next;
         setItems(next);
-        announce(`${widgetTitle(copy, resize.id)} ${copy.builder.resized} ${resize.size.w} × ${resize.size.h}`);
+        announce(`${widgetTitle(copy, resize.id)}: ${copy.builder.resized} ${resize.size.w} × ${resize.size.h}`);
       }
     }
     onFit(rowsOf(committed));
@@ -279,7 +279,7 @@ function GridBoard({
     if (!sameLayout(next, items)) {
       onFit(rowsOf(next));
       setItems(next);
-      announce(`${widgetTitle(copy, item.id)} ${event.shiftKey ? copy.builder.resized : copy.builder.moved}`);
+      announce(`${widgetTitle(copy, item.id)}: ${event.shiftKey ? copy.builder.resized : copy.builder.moved}`);
     }
   };
 
@@ -455,7 +455,7 @@ function ListCard({
     if (to === index || to < 0 || to >= total) return;
     event.preventDefault();
     onMove(index, to);
-    announce(`${widgetTitle(copy, id)} ${copy.builder.moved}`);
+    announce(`${widgetTitle(copy, id)}: ${copy.builder.moved}`);
   };
 
   return (
@@ -477,7 +477,7 @@ function ListCard({
       onKeyDown={onKeyDown}
     >
       <p id={hintId} className="sr-only">
-        {copy.builder.moveHint}
+        {copy.builder.moveHintList}
       </p>
       <GripHandle label={copy.builder.handle} onPointerDown={(event) => controls.start(event)} />
       <WidgetBody id={id} copy={copy} size={MOBILE_SIZE[id]} dragging={dragging} />
@@ -569,6 +569,8 @@ export function DashboardBuilder({ className }: { className?: string }) {
           <GridBoard items={items} setItems={setItems} copy={copy} isRtl={isRtl} announce={setMessage} minRows={heldRows} onGrow={grow} onFit={fit} />
         )}
       </div>
+
+      <p className="mt-3 text-[12px] leading-4 text-muted">{copy.builder.privacy}</p>
 
       <p className="sr-only" role="status" aria-live="polite">
         {message}

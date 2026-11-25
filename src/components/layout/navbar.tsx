@@ -167,6 +167,8 @@ export function Navbar() {
             <button
               type="button"
               onClick={toggleLocale}
+              aria-label={locale === "en" ? "Switch language to Arabic" : "التبديل إلى الإنجليزية"}
+              lang={locale === "en" ? "ar" : "en"}
               className={cn(
                 "hidden h-11 min-w-14 items-center justify-center rounded-full px-3 text-[16px] font-medium leading-5 text-ink lg:inline-flex",
                 "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)] hover:bg-glass-fill active:bg-glass-active",
@@ -286,11 +288,13 @@ function Monogram({
   withName?: boolean;
   onClick: (event: MouseEvent<HTMLAnchorElement>) => void;
 }) {
+  const { locale } = useLocale();
+  const name = locale === "ar" ? "عبدالله زغلول" : site.name;
   return (
     <a
       href="#home"
       onClick={onClick}
-      aria-label={site.name}
+      aria-label={name}
       className="flex items-center gap-3 rounded-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
     >
       <span
@@ -300,7 +304,7 @@ function Monogram({
         AZ
       </span>
       {withName ? (
-        <span className="hidden text-[17px] font-medium leading-[22px] text-ink sm:inline">{site.name}</span>
+        <span className="hidden text-[17px] font-medium leading-[22px] text-ink sm:inline">{name}</span>
       ) : null}
     </a>
   );
@@ -370,6 +374,7 @@ function ThemeSegment({ locale }: { locale: Locale }) {
 }
 
 function ThemeIconButton({ className }: { className?: string }) {
+  const { locale } = useLocale();
   const { theme, setTheme } = useTheme();
   const mounted = useMounted();
   const isDark = mounted && theme === "dark";
@@ -377,7 +382,15 @@ function ThemeIconButton({ className }: { className?: string }) {
   return (
     <IconButton
       className={className}
-      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+      aria-label={
+        locale === "ar"
+          ? isDark
+            ? "التبديل إلى المظهر الفاتح"
+            : "التبديل إلى المظهر الداكن"
+          : isDark
+            ? "Switch to light theme"
+            : "Switch to dark theme"
+      }
       onClick={(event) =>
         mounted && changeTheme(() => setTheme(isDark ? "light" : "dark"), event.currentTarget)
       }

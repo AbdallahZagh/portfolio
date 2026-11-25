@@ -1,10 +1,11 @@
 import type { Locale } from "@/components/locale-provider";
+import { arBugs, arCount } from "@/lib/ar-plural";
 
 /**
  * Hero + builder copy.
- * EN and the Arabic live-state strings are read from the signed-off Figma frames.
- * Arabic strings marked `// AR?` are proposed translations for states Figma does not show
- * (loading, no data, interacting). They need the owner's approval before shipping.
+ * EN and the Arabic live-state strings come from the signed-off Figma frames; the Arabic strings
+ * Figma does not show were reviewed and revised in the v3 content review (portfolio-v3-final.md).
+ * Counts in Arabic go through `arCount` so 1, 2, 3-10 and 11+ each get the right form.
  */
 export type HeroCopy = {
   role: string;
@@ -21,6 +22,9 @@ export type HeroCopy = {
     hintMobile: string;
     reset: string;
     moveHint: string;
+    /** Keyboard hint for the single-column list, where cards only move up and down. */
+    moveHintList: string;
+    privacy: string;
     handle: string;
     resize: string;
     moved: string;
@@ -93,13 +97,15 @@ export const heroCopy: Record<Locale, HeroCopy> = {
     leadRest: " in React, Next.js and TypeScript. Available for worldwide remote opportunities.",
     leadRestMobile: " in React, Next.js and TypeScript. Available for worldwide remote opportunities.",
     talk: "Get in touch",
-    downloadCv: "Download CV",
+    downloadCv: "Download CV · PDF",
     builder: {
       title: "Dashboard builder",
       hintDesktop: "drag to swap · corner to resize",
       hintMobile: "drag to reorder",
       reset: "Reset layout",
       moveHint: "Arrow keys move this widget. Shift plus arrow keys resize it.",
+      moveHintList: "Up and down arrow keys move this widget.",
+      privacy: "Runs locally in your browser — no tracking or data sent.",
       handle: "Drag to move",
       resize: "Drag to resize",
       moved: "moved",
@@ -123,7 +129,7 @@ export const heroCopy: Record<Locale, HeroCopy> = {
         title: "Message oscilloscope",
         sample: "“Hi Abdallah, are you free for a call this week?”",
         warming: "Warming up the scope…",
-        empty: "Start typing in Let's talk to see your signal",
+        empty: "Start typing in Contact to see your signal",
         transmitting: (n) => `Transmitting · ${n} characters`,
       },
       telemetry: {
@@ -172,64 +178,66 @@ export const heroCopy: Record<Locale, HeroCopy> = {
     role: "مهندس واجهات أمامية وقائد تقني (React / Next.js) · دمشق، سوريا",
     headline: { lines: ["واجهات", "للبيانات", "الحيّة."], accent: 1 },
     leadStrong: "أكثر من 4 سنوات في بناء تطبيقات ويب إنتاجية",
-    // AR? lead, talk and downloadCv follow the CV wording, which Figma's Arabic frame does not have
-    leadRest: " باستخدام React وNext.js وTypeScript. متاح لفرص العمل عن بُعد حول العالم.",
-    leadRestMobile: " باستخدام React وNext.js وTypeScript. متاح لفرص العمل عن بُعد حول العالم.",
+    leadRest: " بـ React وNext.js وTypeScript. متاح لفرص العمل عن بُعد حول العالم.",
+    leadRestMobile: " بـ React وNext.js وTypeScript. متاح لفرص العمل عن بُعد حول العالم.",
     talk: "تواصل معي",
-    downloadCv: "تحميل السيرة الذاتية",
+    downloadCv: "تحميل السيرة الذاتية · PDF",
     builder: {
       title: "أداة بناء اللوحات",
       hintDesktop: "اسحب للتبديل · الزاوية لتغيير الحجم",
-      hintMobile: "اسحب لإعادة الترتيب", // AR?
+      hintMobile: "اسحب لإعادة الترتيب",
       reset: "إعادة ضبط التخطيط",
-      moveHint: "مفاتيح الأسهم تحرّك هذه البطاقة، ومع Shift تغيّر حجمها.", // AR?
-      handle: "اسحب للنقل", // AR?
-      resize: "اسحب لتغيير الحجم", // AR?
-      moved: "نُقلت", // AR?
-      resized: "تغيّر حجمها", // AR?
+      moveHint: "استخدم مفاتيح الأسهم لتحريك هذه البطاقة، وShift مع الأسهم لتغيير حجمها.",
+      moveHintList: "استخدم السهمين لأعلى ولأسفل لتحريك هذه البطاقة.",
+      privacy: "يعمل محليًا في متصفحك فقط — دون تتبّع أو إرسال أي بيانات.",
+      handle: "اسحب للتحريك",
+      resize: "اسحب لتغيير الحجم",
+      moved: "تم النقل",
+      resized: "تم تغيير الحجم",
     },
     status: {
-      loading: "جارٍ التحميل", // AR?
-      noData: "لا توجد بيانات", // AR?
+      loading: "جارٍ التحميل",
+      noData: "لا توجد بيانات",
       live: "مباشر",
       typing: "يكتب",
-      sending: "يرسل", // AR?
+      sending: "جارٍ الإرسال",
       stable: "مستقر",
-      patching: "يُصلح", // AR?
+      patching: "جارٍ الإصلاح",
       physicsOn: "الفيزياء مفعّلة",
-      sloshing: "يتموّج", // AR?
-      paused: "متوقف", // AR?
+      sloshing: "يتموّج",
+      paused: "متوقف",
       thisPage: "هذه الصفحة",
     },
     widgets: {
       scope: {
         title: "راسم الرسائل",
-        sample: "”مرحبًا عبدالله، هل أنت متاح لمكالمة هذا الأسبوع؟“",
-        warming: "جارٍ تهيئة الراسم…", // AR?
-        empty: "ابدأ الكتابة في «لنتحدث» لترى إشارتك", // AR?
-        transmitting: (n) => `إرسال · ${n} حرفًا`, // AR?
+        sample: "«مرحبًا عبدالله، هل أنت متاح لمكالمة هذا الأسبوع؟»",
+        warming: "جارٍ تهيئة الراسم…",
+        empty: "ابدأ الكتابة في نموذج التواصل لترى إشارتك",
+        transmitting: (n) =>
+          `إرسال · ${arCount(n, { zero: `${n} أحرف`, one: "حرف واحد", two: "حرفان", few: `${n} أحرف`, many: `${n} حرفًا`, other: `${n} حرف` })}`,
       },
       telemetry: {
         title: "بيانات الزائر",
-        unit: "م مسافة المؤشر",
+        unit: "م من حركة المؤشر",
         scroll: "التمرير",
         onPage: "على الصفحة",
         net: "الشبكة",
-        noCursor: "لا مؤشر", // AR?
-        noCursorHint: "شاشات اللمس تُبلّغ عن التمرير فقط.", // AR?
+        noCursor: "لا يوجد مؤشر",
+        noCursorHint: "شاشات اللمس تسجّل التمرير فقط.",
       },
       reactor: {
         title: "مفاعل الأخطاء",
-        mini: "المفاعل", // AR?
+        mini: "المفاعل",
         core: "النواة",
-        bugs: (n) => `${n} أخطاء`,
-        stable: (n) => `${n} أخطاء · مستقر`,
-        pulse: (n) => `${n} أخطاء · نبضة ×${n}`, // AR?
-        throw: "ارمِ خطأ",
-        patching: "جارٍ الإصلاح…", // AR?
-        starting: "بدء النواة", // AR?
-        tap: "المس النواة", // AR?
-        reducedMotion: "الحركة المخفّضة مفعّلة", // AR?
+        bugs: (n) => arBugs(n),
+        stable: (n) => `${arBugs(n)} · مستقر`,
+        pulse: (n) => `${arBugs(n)} · نبضة ×${n}`,
+        throw: "أطلق خطأً",
+        patching: "جارٍ الإصلاح…",
+        starting: "تشغيل النواة…",
+        tap: "اضغط على النواة",
+        reducedMotion: "تقليل الحركة مفعّل",
       },
       tanks: {
         title: "خزانات التقنيات",
@@ -237,17 +245,17 @@ export const heroCopy: Record<Locale, HeroCopy> = {
           { label: "React", short: "Re", value: 82 },
           { label: "TS", short: "TS", value: 74 },
           { label: "Next.js", short: "Nx", value: 66 },
-          { label: "الحركة", short: "حر", value: 48 },
+          { label: "Motion", short: "Mo", value: 48 },
         ],
       },
       vitals: {
         title: "مؤشرات الويب",
-        mini: "المؤشرات", // AR?
-        measuring: "جارٍ القياس…", // AR?
-        notReported: "غير متاح", // AR?
+        mini: "المؤشرات",
+        measuring: "جارٍ القياس…",
+        notReported: "غير متاح",
         good: "جيد",
-        needsWork: "يحتاج تحسينًا", // AR?
-        poor: "ضعيف", // AR?
+        needsWork: "يحتاج تحسينًا",
+        poor: "ضعيف",
       },
     },
   },
