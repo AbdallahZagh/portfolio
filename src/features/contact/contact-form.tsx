@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
 import { useLocale, type Locale } from "@/components/locale-provider";
 import { site } from "@/data/portfolio";
@@ -21,8 +21,15 @@ type FormCopy = {
   sending: string;
   sent: string;
   failed: string;
+  wait: string;
+  errors: { name: string; email: string; message: string };
   arrow: string;
 };
+
+/** A second message is accepted only after this long, so a bot cannot flood the inbox. */
+const COOLDOWN_MS = 30_000;
+const MIN_MESSAGE_LENGTH = 10;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 const copy: Record<Locale, FormCopy> = {
   en: {
@@ -36,6 +43,12 @@ const copy: Record<Locale, FormCopy> = {
     sending: "Sending…",
     sent: "Message sent. I'll reply soon.",
     failed: `Could not send the message. Email me at ${site.email}.`,
+    wait: "Please wait a moment before sending another message.",
+    errors: {
+      name: "Please enter your name",
+      email: "Enter a valid email address",
+      message: `Write at least ${MIN_MESSAGE_LENGTH} characters`,
+    },
     arrow: "↗",
   },
   ar: {
@@ -46,10 +59,15 @@ const copy: Record<Locale, FormCopy> = {
     message: "الرسالة",
     messagePlaceholder: "ماذا تبني؟",
     send: "إرسال الرسالة",
-    // AR? the three strings below are not in Figma
     sending: "جارٍ الإرسال…",
-    sent: "تم إرسال الرسالة. سأردّ قريبًا.",
-    failed: `تعذّر إرسال الرسالة. راسلني على ${site.email}.`,
+    sent: "تم إرسال رسالتك. سأردّ عليك قريبًا.",
+    failed: `تعذّر إرسال الرسالة. راسلني مباشرة على ${site.email}.`,
+    wait: "يرجى الانتظار قليلًا قبل إرسال رسالة أخرى.",
+    errors: {
+      name: "يرجى إدخال اسمك",
+      email: "أدخل بريدًا إلكترونيًا صحيحًا",
+      message: `اكتب ${MIN_MESSAGE_LENGTH} أحرف على الأقل`,
+    },
     arrow: "↖",
   },
 };
@@ -61,19 +79,59 @@ const labelClass = "block text-[15px] font-medium leading-5 text-contact-muted";
 const inputClass =
   "mt-2 block w-full bg-transparent text-[17px] leading-[26px] text-contact-ink outline-none placeholder:text-contact-muted placeholder:opacity-70 disabled:opacity-60 md:text-[18px] md:leading-[27px]";
 
+function FieldError({ id, message }: { id: string; message?: string }) {
+  if (!message) return null;
+  return (
+    <span id={id} role="alert" className="mt-2 block text-[14px] font-medium leading-5 text-contact-error">
+      {message}
+    </span>
+  );
+}
+
 export function ContactForm({ className }: { className?: string }) {
   const { locale } = useLocale();
   const text = copy[locale];
   const [values, setValues] = useState({ name: "", email: "", message: "" });
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "failed">("idle");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "failed" | "wait">("idle");
+  const [errors, setErrors] = useState<Partial<Record<"name" | "email" | "message", string>>>({});
+  const lastSentAt = useRef(0);
+  const formId = useId();
+  const errorId = (field: string) => `${formId}-${field}-error`;
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setValues((prev) => ({ ...prev, [name]: value }));
+    if (name in errors) setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    const form = event.currentTarget as HTMLFormElement;
+    // Hidden field: people never see it, bots fill it. Pretend it worked and send nothing.
+    if ((form.elements.namedItem("company") as HTMLInputElement | null)?.value) {
+      setValues({ name: "", email: "", message: "" });
+      setStatus("sent");
+      return;
+    }
+
+    const found: Partial<Record<"name" | "email" | "message", string>> = {};
+    if (!values.name.trim()) found.name = text.errors.name;
+    if (!EMAIL_PATTERN.test(values.email.trim())) found.email = text.errors.email;
+    if (values.message.trim().length < MIN_MESSAGE_LENGTH) found.message = text.errors.message;
+    setErrors(found);
+    const firstInvalid = (["name", "email", "message"] as const).find((field) => found[field]);
+    if (firstInvalid) {
+      setStatus("idle");
+      (form.elements.namedItem(firstInvalid) as HTMLElement | null)?.focus();
+      return;
+    }
+
+    if (Date.now() - lastSentAt.current < COOLDOWN_MS) {
+      setStatus("wait");
+      return;
+    }
+
     setStatus("sending");
     try {
       const result = await emailjs.send(
@@ -93,6 +151,7 @@ export function ContactForm({ className }: { className?: string }) {
         { publicKey: EMAILJS_PUBLIC_KEY },
       );
       if (result.status !== 200) throw result;
+      lastSentAt.current = Date.now();
       setValues({ name: "", email: "", message: "" });
       setStatus("sent");
     } catch (error) {
@@ -104,7 +163,18 @@ export function ContactForm({ className }: { className?: string }) {
   const sending = status === "sending";
 
   return (
-    <form onSubmit={onSubmit} className={cn("flex flex-col gap-8", className)}>
+    <form onSubmit={onSubmit} noValidate className={cn("flex flex-col gap-8", className)}>
+      {/* Honeypot: off-screen and skipped by keyboards and screen readers. */}
+      <input
+        name="company"
+        type="text"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        defaultValue=""
+        className="sr-only"
+      />
+
       <label className={fieldClass}>
         <span className={labelClass}>{text.name}</span>
         <input
@@ -112,12 +182,15 @@ export function ContactForm({ className }: { className?: string }) {
           type="text"
           autoComplete="name"
           required
+          aria-invalid={Boolean(errors.name)}
+          aria-describedby={errors.name ? errorId("name") : undefined}
           disabled={sending}
           value={values.name}
           onChange={onChange}
           placeholder={text.namePlaceholder}
           className={inputClass}
         />
+        <FieldError id={errorId("name")} message={errors.name} />
       </label>
 
       <label className={fieldClass}>
@@ -127,6 +200,8 @@ export function ContactForm({ className }: { className?: string }) {
           type="email"
           autoComplete="email"
           required
+          aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? errorId("email") : undefined}
           disabled={sending}
           value={values.email}
           onChange={onChange}
@@ -135,6 +210,7 @@ export function ContactForm({ className }: { className?: string }) {
           dir="ltr"
           className={cn(inputClass, "rtl:text-right")}
         />
+        <FieldError id={errorId("email")} message={errors.email} />
       </label>
 
       <label className={fieldClass}>
@@ -142,6 +218,8 @@ export function ContactForm({ className }: { className?: string }) {
         <textarea
           name="message"
           required
+          aria-invalid={Boolean(errors.message)}
+          aria-describedby={errors.message ? errorId("message") : undefined}
           disabled={sending}
           value={values.message}
           onChange={onChange}
@@ -149,6 +227,7 @@ export function ContactForm({ className }: { className?: string }) {
           rows={3}
           className={cn(inputClass, "h-[79px] resize-none")}
         />
+        <FieldError id={errorId("message")} message={errors.message} />
       </label>
 
       <div className="flex flex-col items-start gap-4">
@@ -166,11 +245,11 @@ export function ContactForm({ className }: { className?: string }) {
           aria-live="polite"
           className={cn(
             "text-[15px] leading-[22px]",
-            status === "failed" ? "text-contact-error" : "text-contact-accent",
-            status === "sent" || status === "failed" ? "" : "sr-only",
+            status === "failed" || status === "wait" ? "text-contact-error" : "text-contact-accent",
+            status === "sent" || status === "failed" || status === "wait" ? "" : "sr-only",
           )}
         >
-          {status === "sent" ? text.sent : status === "failed" ? text.failed : ""}
+          {status === "sent" ? text.sent : status === "failed" ? text.failed : status === "wait" ? text.wait : ""}
         </p>
       </div>
     </form>
