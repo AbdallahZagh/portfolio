@@ -1,28 +1,29 @@
 "use client";
 
-import Image from "next/image";
-import { Award, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { ArrowUpRight, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLenis } from "lenis/react";
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
 import { publicAsset } from "@/lib/public-asset";
+import { useMounted } from "@/lib/use-mounted";
 
 type CertificatePreviewProps = {
   src: string;
   alt: string;
+  label: string;
+  dialogTitle: string;
+  closeLabel: string;
 };
 
-export function CertificatePreview({ src, alt }: CertificatePreviewProps) {
+/** Figma "Internship certificate ↗" button: opens the certificate image in a dialog. */
+export function CertificatePreview({ src, alt, label, dialogTitle, closeLabel }: CertificatePreviewProps) {
   const resolvedSrc = publicAsset(src);
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const lenis = useLenis();
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
 
   const closeModal = useCallback(() => setOpen(false), []);
 
@@ -59,36 +60,17 @@ export function CertificatePreview({ src, alt }: CertificatePreviewProps) {
 
   return (
     <>
-      <button
-        type="button"
+      <Button
+        variant="outline"
+        size="sm"
+        className="px-[22px]"
         onClick={() => setOpen(true)}
-        className="group/cert flex w-full gap-4 rounded-xl border border-border bg-surface/50 p-3 text-left outline-none transition-colors hover:border-primary/40 hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:p-4"
         aria-haspopup="dialog"
         aria-expanded={open}
-        aria-label={`View certificate: ${alt}`}
       >
-        <div className="relative h-24 w-[4.75rem] shrink-0 overflow-hidden rounded-lg border border-border/40 bg-background/50 shadow-inner sm:h-28 sm:w-[5.5rem]">
-          <Image
-            src={resolvedSrc}
-            alt=""
-            fill
-            sizes="96px"
-            className="object-cover object-top transition duration-300 group-hover/cert:brightness-105"
-          />
-        </div>
-        <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5">
-          <span className="inline-flex items-center gap-2 font-display text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-primary">
-            <Award className="h-3.5 w-3.5 shrink-0 opacity-90" aria-hidden />
-            Internship certificate
-          </span>
-          <span className="text-xs leading-snug text-muted sm:text-sm">
-            NPT Solutions · Paws Pal Connect · Oct 2025 – Feb 2026
-          </span>
-          <span className="font-display text-[0.65rem] uppercase tracking-wider text-primary">
-            Open preview
-          </span>
-        </div>
-      </button>
+        {label}
+        <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+      </Button>
 
       {mounted
         ? createPortal(
@@ -99,7 +81,7 @@ export function CertificatePreview({ src, alt }: CertificatePreviewProps) {
                   role="presentation"
                 >
                   <motion.div
-                    className="absolute inset-0 bg-black/70 backdrop-blur-sm dark:bg-background/75"
+                    className="absolute inset-0 bg-ink/60 backdrop-blur-sm"
                     onClick={closeModal}
                     aria-hidden
                     initial={{ opacity: 0 }}
@@ -110,27 +92,20 @@ export function CertificatePreview({ src, alt }: CertificatePreviewProps) {
                   <motion.div
                     role="dialog"
                     aria-modal="true"
-                    aria-label={alt}
-                    className="relative z-10 flex max-h-[min(95dvh,calc(100dvh-1.5rem))] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-border/50 bg-card shadow-2xl ring-1 ring-primary/15 dark:ring-secondary/10"
-                    initial={{ opacity: 0, y: 16, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 12, scale: 0.98 }}
-                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                    aria-label={dialogTitle}
+                    className="relative z-10 flex max-h-[min(95dvh,calc(100dvh-1.5rem))] w-full max-w-3xl flex-col overflow-hidden rounded-[18px] border border-line bg-bg"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 12 }}
+                    transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border/40 px-4 py-3 sm:px-5">
-                      <span className="font-display text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted">
-                        Certificate preview
-                      </span>
-                      <button
-                        type="button"
-                        onClick={closeModal}
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted transition hover:bg-surface hover:text-foreground"
-                        aria-label="Close"
-                      >
-                        <X className="h-4 w-4" strokeWidth={2.2} />
-                      </button>
+                    <header className="flex shrink-0 items-center justify-between gap-3 border-b border-line ps-5 pe-2">
+                      <h3 className="text-[15px] font-semibold leading-5 text-ink">{dialogTitle}</h3>
+                      <IconButton onClick={closeModal} aria-label={closeLabel} autoFocus>
+                        <X className="size-5" aria-hidden="true" />
+                      </IconButton>
                     </header>
-                    <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-linear-to-b from-muted/20 to-card p-3 sm:p-5">
+                    <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-surface p-3 sm:p-5">
                       {/* eslint-disable-next-line @next/next/no-img-element -- publicAsset path must match basePath; Next Image loader differs for static export */}
                       <img
                         src={resolvedSrc}
@@ -143,7 +118,7 @@ export function CertificatePreview({ src, alt }: CertificatePreviewProps) {
                 </div>
               ) : null}
             </AnimatePresence>,
-            document.body
+            document.body,
           )
         : null}
     </>

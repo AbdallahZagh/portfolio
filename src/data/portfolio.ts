@@ -64,70 +64,123 @@ export const socialLinks = [
   },
 ];
 
+/** A string in both site languages. */
+export type Localized<T = string> = { en: T; ar: T };
+
 export type Experience = {
-  title: string;
-  company: string;
-  period: string;
-  location: string;
-  tags: string[];
-  achievements: string[];
+  id: string;
+  title: Localized;
+  /** Company line as shown, e.g. "Elathr Business · Remote". */
+  company: Localized;
+  period: Localized;
+  tags: Localized<string[]>;
+  notes: Localized<string[]>;
   certificate?: { src: string; alt: string };
 };
 
+/** Newest first. Wording follows the signed-off Figma frames (condensed from the CV bullets). */
 export const experiences: Experience[] = [
   {
-    title: "Frontend Web Developer",
-    company: "Sama-Tech",
-    period: "Mar 2026 – Present",
-    location: "On-Site",
-    tags: ["Next.js 16", "React 19", "TypeScript", "Zustand", "GSAP", "Mapbox GL"],
-    achievements: [
-      "Engineered a multi-page corporate marketing website using Next.js 16 and React 19, showcasing IoT and ESG solutions with interactive, scroll-driven UI behaviors powered by Framer Motion and GSAP.",
-      "Built a multi-module admin dashboard (Sama Fire) utilizing React 19 and Vite for real-time gateway monitoring, incident events, and maintenance workflows.",
-      "Implemented role-based access control, organization-wide filtering, and Firebase push notifications, ensuring live data synchronization across events and Mapbox GL map views.",
-      "Architected scalable and responsive front-end solutions utilizing Tailwind CSS v4, TypeScript, and Zustand.",
-    ],
+    id: "elathr",
+    title: { en: "Technical Lead (Contract)", ar: "قائد تقني (عقد)" },
+    company: { en: "Elathr Business · Remote", ar: "Elathr Business · عن بُعد" },
+    period: { en: "Oct 2026 – Present", ar: "أكتوبر 2026 – الآن" },
+    tags: {
+      en: ["Vendor delivery", "Requirements", "Sprint QA"],
+      ar: ["تسليم المزوّد", "المتطلبات", "اختبار السبرنت"],
+    },
+    notes: {
+      en: [
+        "Lead delivery of 4 vendor-built products: the Elathr and AidPoint websites and the RasilPay and Rihza apps.",
+        "QA every vendor sprint end to end on web and mobile, with written defect reports.",
+      ],
+      ar: [
+        "أقود تسليم 4 منتجات يطوّرها مزوّد خارجي: موقعا Elathr وAidPoint وتطبيقا RasilPay وRihza.",
+        "أختبر كل سبرنت للمزوّد من البداية إلى النهاية على الويب والجوال، مع تقارير مكتوبة بالأخطاء.",
+      ],
+    },
   },
   {
-    title: "Frontend Web Developer (Freelance)",
-    company: "Self-Employed",
-    period: "2023 – Present",
-    location: "Remote",
-    tags: ["React", "Dashboards", "Performance"],
-    achievements: [
-      "Developed 5+ responsive web applications, focusing on high performance and component reusability.",
-      "Built custom booking systems and API-driven dashboards for international clients.",
-      "Optimized web performance and accessibility, achieving 90+ Lighthouse scores for key client projects.",
-    ],
+    id: "sama-tech",
+    title: { en: "Frontend Engineer", ar: "مهندس واجهات أمامية" },
+    company: { en: "Sama-Tech", ar: "Sama-Tech" },
+    period: { en: "Mar 2026 – Present", ar: "مارس 2026 – الآن" },
+    tags: {
+      en: ["React 19", "Next.js 16", "Socket.IO", "Mapbox GL"],
+      ar: ["React 19", "Next.js 16", "Socket.IO", "Mapbox GL"],
+    },
+    notes: {
+      en: [
+        "Built IoT Platform v2 single-handedly: a drag-and-drop dashboard builder with 30+ widget types and 20+ IoT modules with real-time telemetry.",
+        "Built the Sama Fire monitoring platform and the 25-page company website in Next.js 16.",
+      ],
+      ar: [
+        "بنيت منصة IoT Platform v2 بمفردي: أداة لبناء لوحات التحكم بالسحب والإفلات، فيها أكثر من 30 نوعًا من الودجات وأكثر من 20 وحدة IoT ببيانات لحظية.",
+        "بنيت منصة Sama Fire للمراقبة وموقع الشركة المكوّن من 25 صفحة باستخدام Next.js 16.",
+      ],
+    },
   },
   {
-    title: "Frontend Team Lead (React)",
-    company: "PawsPalConnect",
-    period: "Oct 2025 – Feb 2026",
-    location: "Remote",
-    tags: ["React 19", "Redux Toolkit", "Team Lead", "E-Commerce"],
-    achievements: [
-      "Lead and mentor a 3-person frontend team: technical decisions, reviews, and delivery.",
-      "Architected a production-grade pet-care platform utilizing React 19 and Redux Toolkit, resulting in a highly scalable and maintainable codebase.",
-      "Developed complex features including appointment booking, vaccination tracking, and an e-commerce dashboard.",
-      "Implemented a modern, responsive design system using Tailwind CSS v4, reducing CSS technical debt.",
-      "Integrated real-time data visualization using Chart.js and Recharts for operational insights.",
-    ],
+    id: "freelance",
+    title: { en: "Software Developer (Freelance)", ar: "مطوّر برمجيات (عمل حر)" },
+    company: { en: "Freelance", ar: "عمل حر" },
+    period: { en: "2023 – Present", ar: "2023 – الآن" },
+    tags: {
+      en: ["Odoo", "React", "Performance"],
+      ar: ["Odoo", "React", "الأداء"],
+    },
+    notes: {
+      en: [
+        "Co-developed a bilingual university housing and hospitality ERP on Odoo 20.",
+        "5+ responsive web apps, booking systems and API-driven dashboards, with 90+ Lighthouse scores.",
+      ],
+      ar: [
+        "شاركت في تطوير نظام ERP ثنائي اللغة للسكن الجامعي والضيافة على Odoo 20.",
+        "أكثر من 5 تطبيقات ويب متجاوبة وأنظمة حجز ولوحات تحكم تعتمد على واجهات API، بنتائج Lighthouse تتجاوز 90.",
+      ],
+    },
+  },
+  {
+    id: "pawspalconnect",
+    title: { en: "Frontend Team Lead (React)", ar: "قائد فريق الواجهات الأمامية (React)" },
+    company: { en: "PawsPalConnect", ar: "PawsPalConnect" },
+    period: { en: "Oct 2025 – Feb 2026", ar: "أكتوبر 2025 – فبراير 2026" },
+    tags: {
+      en: ["React 19", "Redux Toolkit", "Team lead"],
+      ar: ["React 19", "Redux Toolkit", "قيادة الفريق"],
+    },
+    notes: {
+      en: [
+        "Led and mentored a 3-person frontend team: technical decisions, code reviews and delivery.",
+        "Appointment booking, vaccination tracking and an e-commerce dashboard.",
+      ],
+      ar: [
+        "قدت فريق واجهات أمامية من 3 أشخاص ووجّهته: القرارات التقنية ومراجعة الشيفرة والتسليم.",
+        "حجز المواعيد ومتابعة التطعيمات ولوحة تحكم لمتجر إلكتروني.",
+      ],
+    },
     certificate: {
       src: "/ppc-certificate.png",
       alt: "Internship completion certificate — Paws Pal Connect (NPT Solutions), Front-End Team Lead Intern, Abdallah Zaghloul, October 2025 to February 2026",
     },
   },
   {
-    title: "Frontend Web Developer",
-    company: "Goma+",
-    period: "Nov 2022 – Nov 2023",
-    location: "Remote",
-    tags: ["React", "Tailwind CSS"],
-    achievements: [
-      "Built responsive React and Tailwind interfaces with a cross-functional team.",
-      "Maintained production UI and fixed performance issues that were driving bug reports.",
-    ],
+    id: "goma",
+    title: { en: "Frontend Web Developer", ar: "مطوّر واجهات ويب أمامية" },
+    company: { en: "Goma+", ar: "Goma+" },
+    period: { en: "Nov 2022 – Nov 2023", ar: "نوفمبر 2022 – نوفمبر 2023" },
+    tags: {
+      en: ["React", "Tailwind CSS"],
+      ar: ["React", "Tailwind CSS"],
+    },
+    notes: {
+      en: [
+        "Responsive React and Tailwind production interfaces, fixing the performance issues behind recurring bug reports.",
+      ],
+      ar: [
+        "واجهات إنتاجية متجاوبة بـ React وTailwind، مع حل مشكلات الأداء التي كانت وراء بلاغات الأخطاء المتكررة.",
+      ],
+    },
   },
 ];
 

@@ -15,8 +15,8 @@ export function HeroSection() {
   const { lines, accent, accentWord } = copy.headline;
 
   return (
-    <section id="home" className="relative">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 pb-12 pt-6 sm:px-8 xl:grid-cols-[minmax(0,1fr)_536px] xl:gap-8 xl:px-14 xl:pb-0 xl:pt-14">
+    <section id="home" className="relative flex min-h-svh items-center">
+      <div className="mx-auto grid w-full max-w-[1440px] items-center gap-12 px-5 pb-12 pt-28 sm:px-8 xl:grid-cols-[minmax(0,1fr)_536px] xl:gap-8 xl:px-14 xl:pb-12 xl:pt-32">
         <div className="flex min-w-0 flex-col gap-6 md:gap-8">
           <p className="text-[15px] font-medium leading-5 text-muted md:text-[16px]">{copy.role}</p>
 
@@ -80,7 +80,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        <div className="min-w-0 xl:pt-[9px]">
+        <div className="min-w-0">
           <DashboardBuilder />
         </div>
       </div>
