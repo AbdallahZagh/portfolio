@@ -293,7 +293,10 @@ function Monogram({
       aria-label={site.name}
       className="flex items-center gap-3 rounded-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
     >
-      <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-brand text-[17px] font-semibold leading-5 text-on-brand">
+      <span
+        aria-hidden="true"
+        className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-brand text-[17px] font-semibold leading-5 text-on-brand"
+      >
         AZ
       </span>
       {withName ? (

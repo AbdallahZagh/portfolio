@@ -85,8 +85,7 @@ function GripHandle({
   return (
     <span
       data-handle=""
-      role="presentation"
-      aria-label={label}
+      aria-hidden="true"
       title={label}
       className={cn(
         "absolute end-0.5 top-1 z-10 grid h-8 w-7 cursor-grab touch-none place-items-center text-muted",
@@ -461,6 +460,7 @@ function ListCard({
 
   return (
     <Reorder.Item
+      as="div"
       value={id}
       dragListener={false}
       dragControls={controls}
@@ -507,7 +507,7 @@ function ListBoard({
   );
 
   return (
-    <Reorder.Group axis="y" values={order} onReorder={setOrder} className="flex flex-col gap-3">
+    <Reorder.Group as="div" axis="y" values={order} onReorder={setOrder} className="flex flex-col gap-3">
       {order.map((id, index) => (
         <ListCard key={id} id={id} copy={copy} index={index} total={order.length} onMove={onMove} announce={announce} />
       ))}
