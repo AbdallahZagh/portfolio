@@ -338,7 +338,8 @@ svg {
 
 @keyframes drop {
   from {
-    translate: 0 -12px;
+    translate: 0 -8px;
+    opacity: 0;
   }
 }
 
@@ -381,7 +382,115 @@ svg {
 }
 
 .nav-drop {
-  animation: drop var(--duration-reveal) var(--ease-out-expo) both;
+  animation: drop 400ms var(--ease-out-expo) both;
+}
+
+/* Navbar: clear at the top, frosted once the page has scrolled. A separate layer fades in, so the
+   blur never has to animate. No heavy shadow, just a hairline and a faint top highlight. */
+.nav-frost {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background-color: color-mix(in srgb, var(--bg) 70%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  border-bottom: 1px solid var(--line);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  transition: opacity 240ms cubic-bezier(0.2, 0, 0, 1);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .nav-frost {
+  background-color: color-mix(in srgb, var(--bg) 55%, transparent);
+}
+
+[data-frosted="true"] > .nav-frost {
+  opacity: 1;
+}
+
+/* The written name folds away into the AZ mark once the hero is behind. */
+.nav-name {
+  display: none;
+  overflow: hidden;
+  max-width: 240px;
+  margin-inline-start: 12px;
+  opacity: 1;
+  transition:
+    max-width 300ms var(--ease-standard),
+    margin-inline-start 300ms var(--ease-standard),
+    opacity 300ms var(--ease-standard);
+}
+
+@media (min-width: 640px) {
+  .nav-name {
+    display: block;
+  }
+}
+
+.nav-name[data-collapsed="true"] {
+  max-width: 0;
+  margin-inline-start: 0;
+  opacity: 0;
+}
+
+/* Menu: a circle opens from the burger on phones, a side panel with a scrim slides in on tablets. */
+.menu-panel {
+  position: absolute;
+  inset: 0;
+  clip-path: circle(0px at var(--ox, 90%) var(--oy, 36px));
+  transition: clip-path 500ms var(--ease-out-expo);
+}
+
+.menu-panel[data-open="true"] {
+  clip-path: circle(150vmax at var(--ox, 90%) var(--oy, 36px));
+}
+
+.menu-scrim {
+  opacity: 0;
+  transition: opacity 280ms var(--ease-standard);
+}
+
+.menu-scrim[data-open="true"] {
+  opacity: 1;
+}
+
+.menu-item {
+  opacity: 0;
+  translate: 0 12px;
+  transition:
+    opacity 200ms var(--ease-standard),
+    translate 200ms var(--ease-standard);
+}
+
+.menu-panel[data-open="true"] .menu-item {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 400ms var(--ease-out-expo),
+    translate 400ms var(--ease-out-expo);
+  transition-delay: calc(120ms + var(--i, 0) * 40ms);
+}
+
+@media (min-width: 768px) {
+  .menu-panel {
+    inset: 0 0 0 auto;
+    width: 400px;
+    clip-path: none;
+    translate: 100% 0;
+    border-inline-start: 1px solid var(--line);
+    transition: translate 400ms var(--ease-out-expo);
+  }
+
+  [dir="rtl"] .menu-panel {
+    inset: 0 auto 0 0;
+    translate: -100% 0;
+  }
+
+  .menu-panel[data-open="true"],
+  [dir="rtl"] .menu-panel[data-open="true"] {
+    clip-path: none;
+    translate: 0 0;
+  }
 }
 
 /* Builder widgets arrive 120ms after the buttons, 60ms apart. */
@@ -445,6 +554,31 @@ html.theme-switching body {
     transition-duration: 150ms !important;
     transition-timing-function: linear !important;
     scroll-behavior: auto !important;
+  }
+
+  .menu-panel,
+  .menu-panel[data-open="true"] {
+    clip-path: none;
+    translate: none;
+    transition: opacity 150ms linear;
+  }
+
+  .menu-panel {
+    opacity: 0;
+  }
+
+  .menu-panel[data-open="true"] {
+    opacity: 1;
+  }
+
+  .menu-item,
+  .menu-panel[data-open="true"] .menu-item {
+    translate: none;
+    transition-delay: 0ms;
+  }
+
+  .nav-name {
+    transition: opacity 150ms linear;
   }
 
   .line-rise,

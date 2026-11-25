@@ -1,20 +1,34 @@
 "use client";
 
-import { useCallback, useEffect, useId, useState, type MouseEvent, type ReactNode } from "react";
-import { ArrowUpLeft, ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
+import { ArrowUpLeft, ArrowUpRight, Mail, Menu, Moon, Sun, X } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { useLenis } from "lenis/react";
 import { useTheme } from "next-themes";
 import { site } from "@/data/portfolio";
 import { Cta } from "@/components/ui/cta";
 import { IconButton } from "@/components/ui/icon-button";
-import { NavPillLink } from "@/components/ui/nav-pill-link";
 import { useLocale, type Locale } from "@/components/locale-provider";
 import { cn } from "@/lib/utils";
 import { useMounted } from "@/lib/use-mounted";
 import { changeTheme } from "@/lib/theme-transition";
 
 const NAV_OFFSET = -90;
-const SECTION_IDS = ["home", "experience", "projects", "skills", "contact"];
+const SECTION_IDS = ["experience", "projects", "skills", "contact"] as const;
+/** The bar turns frosted after this much scroll. */
+const FROST_AT = 24;
+/** Time the sheet needs to finish its closing animation before it leaves the DOM. */
+const SHEET_MS = 520;
 
 const links = [
   { href: "#experience", en: "Experience", ar: "الخبرة" },
@@ -30,9 +44,14 @@ const copy = {
     dark: "Dark",
     language: "Language",
     talk: "Get in touch",
-    switchLanguage: "عربي",
+    switchLanguage: "ع",
+    switchLanguageLabel: "Switch language to Arabic",
+    primary: "Primary",
     close: "Close menu",
     open: "Open menu",
+    toLight: "Switch to light theme",
+    toDark: "Switch to dark theme",
+    name: site.name,
   },
   ar: {
     menu: "القائمة",
@@ -42,95 +61,187 @@ const copy = {
     language: "اللغة",
     talk: "تواصل معي",
     switchLanguage: "EN",
+    switchLanguageLabel: "التبديل إلى الإنجليزية",
+    primary: "التنقل الرئيسي",
     close: "إغلاق القائمة",
     open: "فتح القائمة",
+    toLight: "التبديل إلى المظهر الفاتح",
+    toDark: "التبديل إلى المظهر الداكن",
+    name: "عبدالله زغلول",
   },
 } as const;
 
-function activeFromScroll() {
-  const probe = 110;
-  let current = SECTION_IDS[0];
-
-  for (const id of SECTION_IDS) {
-    const el = document.getElementById(id);
-    if (!el) continue;
-    if (el.getBoundingClientRect().top <= probe) current = id;
-  }
-
-  const doc = document.documentElement;
-  if (window.innerHeight + doc.scrollTop >= doc.scrollHeight - 48) {
-    current = "contact";
-  }
-
-  return `#${current}`;
-}
-
-function useScrolledSection() {
-  const [active, setActive] = useState("#experience");
-  const syncActive = useCallback(() => {
-    setActive(activeFromScroll());
-  }, []);
-
-  useLenis(syncActive);
+/**
+ * Which section is under the middle of the viewport. A thin band at mid-height means exactly one
+ * section matches at a time, and none does on the hero, so nothing is highlighted at the top.
+ */
+function useActiveSection() {
+  const [active, setActive] = useState("");
+  const visible = useRef(new Set<string>());
+  const lockedUntil = useRef(0);
+  const settle = useRef<() => void>(() => {});
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(syncActive);
-    window.addEventListener("scroll", syncActive, { passive: true });
-    window.addEventListener("resize", syncActive);
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", syncActive);
-      window.removeEventListener("resize", syncActive);
+    const resolve = () => {
+      const id = SECTION_IDS.find((section) => visible.current.has(section));
+      setActive(id ? `#${id}` : "");
     };
-  }, [syncActive]);
+    settle.current = resolve;
 
-  return [active, setActive] as const;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.current.add(entry.target.id);
+          else visible.current.delete(entry.target.id);
+        }
+        // While a click-scroll is travelling, the clicked link stays active instead of flickering.
+        if (Date.now() >= lockedUntil.current) resolve();
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+
+    for (const id of SECTION_IDS) {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    }
+    return () => observer.disconnect();
+  }, []);
+
+  /** Mark a link active right away, and hand control back to the observer once the scroll lands. */
+  const hold = useCallback((href: string, ms = 1300) => {
+    lockedUntil.current = Date.now() + ms;
+    setActive(href);
+    window.setTimeout(() => settle.current(), ms + 20);
+  }, []);
+
+  return [active, hold] as const;
+}
+
+/** Frosted bar after FROST_AT px, and a collapsed name once the hero has scrolled away. */
+function useBarState() {
+  const [frosted, setFrosted] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setFrosted(window.scrollY >= FROST_AT);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    const hero = document.getElementById("home");
+    let observer: IntersectionObserver | undefined;
+    if (hero) {
+      observer = new IntersectionObserver(([entry]) => setPastHero(!entry.isIntersecting), {
+        rootMargin: "-56px 0px 0px 0px",
+      });
+      observer.observe(hero);
+    }
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      observer?.disconnect();
+    };
+  }, []);
+
+  return { frosted, pastHero };
 }
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
   const { locale, setLocale } = useLocale();
-  const [active, setActive] = useScrolledSection();
+  const [active, hold] = useActiveSection();
+  const { frosted, pastHero } = useBarState();
   const lenis = useLenis();
+  const reduce = useReducedMotion();
   const text = copy[locale];
   const menuTitleId = useId();
 
-  useEffect(() => {
-    if (!lenis) return;
-    if (isOpen) lenis.stop();
-    else lenis.start();
-    return () => lenis.start();
-  }, [isOpen, lenis]);
+  // `mounted` keeps the sheet in the DOM while it animates out; `shown` is the real open state.
+  const [mounted, setMounted] = useState(false);
+  const [shown, setShown] = useState(false);
+  const [origin, setOrigin] = useState({ x: 0, y: 0 });
+  const burger = useRef<HTMLButtonElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  const timer = useRef<number | undefined>(undefined);
 
+  const openMenu = () => {
+    window.clearTimeout(timer.current);
+    const rect = burger.current?.getBoundingClientRect();
+    if (rect) setOrigin({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+    setMounted(true);
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => setShown(true)));
+  };
+
+  const closeMenu = useCallback(() => {
+    setShown(false);
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setMounted(false), SHEET_MS);
+  }, []);
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  // Page scroll is locked only while the sheet is really open.
   useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
+    if (!shown) return;
+    lenis?.stop();
+    const opener = burger.current;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    closeButton.current?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeMenu();
+    };
+    document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = previous;
+      lenis?.start();
+      opener?.focus({ preventScroll: true });
     };
-  }, [isOpen]);
+  }, [shown, lenis, closeMenu]);
+
+  // Leaving the mobile range with the sheet open would strand it.
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => {
+      if (query.matches) {
+        window.clearTimeout(timer.current);
+        setShown(false);
+        setMounted(false);
+      }
+    };
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, []);
+
+  const trapTab = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Tab" || !panel.current) return;
+    const items = panel.current.querySelectorAll<HTMLElement>("a[href], button:not([disabled])");
+    if (items.length === 0) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
   const scrollTo = (href: string) => {
     const el = document.querySelector<HTMLElement>(href);
     if (!el) return;
-    setActive(href);
+    if (href !== "#home") hold(href);
     if (lenis) {
-      lenis.scrollTo(el, { offset: NAV_OFFSET, duration: 1.05 });
+      lenis.scrollTo(el, { offset: NAV_OFFSET, duration: 1.05, force: true });
       return;
     }
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   };
 
   const follow = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
     event.preventDefault();
     event.stopPropagation();
-    setIsOpen(false);
+    if (mounted) closeMenu();
     scrollTo(href);
   };
 
@@ -138,54 +249,87 @@ export function Navbar() {
 
   return (
     <>
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-40 bg-transparent px-4 pt-3 lg:px-8 lg:pt-4">
+      <header className="nav-drop fixed inset-x-0 top-0 z-40 h-14" data-frosted={frosted}>
+        <div aria-hidden="true" className="nav-frost" />
         <nav
-          aria-label={locale === "ar" ? "التنقل الرئيسي" : "Primary"}
-          className="nav-drop liquid-glass-pill pointer-events-auto relative mx-auto flex h-16 w-full max-w-[1328px] items-center justify-between rounded-full px-3 lg:h-[70px] lg:px-4"
+          aria-label={text.primary}
+          className="relative mx-auto flex h-full w-full max-w-[1440px] items-center justify-between px-5 sm:px-8 xl:px-14"
         >
-          <Monogram withName onClick={(event) => follow(event, "#home")} />
+          <Monogram name={text.name} collapsed={pastHero} onClick={(event) => follow(event, "#home")} />
 
           <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 lg:flex">
             {links.map((link) => {
-              const isActive =
-                active === link.href || (link.href === "#experience" && active === "#home");
+              const isActive = active === link.href;
               return (
-                <NavPillLink
+                <a
                   key={link.href}
                   href={link.href}
-                  active={isActive}
+                  aria-current={isActive ? "true" : undefined}
                   onClick={(event) => follow(event, link.href)}
+                  className={cn(
+                    "relative inline-flex h-11 items-center rounded-full px-4 text-[16px] font-medium leading-5",
+                    "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)]",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+                    isActive ? "text-ink" : "text-muted hover:text-ink",
+                  )}
                 >
-                  {locale === "ar" ? link.ar : link.en}
-                </NavPillLink>
+                  {isActive ? (
+                    <motion.span
+                      layoutId="nav-active-pill"
+                      aria-hidden="true"
+                      className="absolute inset-0 rounded-full bg-glass-active ring-1 ring-inset ring-glass-stroke"
+                      transition={reduce ? { duration: 0.15 } : { type: "spring", stiffness: 420, damping: 32 }}
+                    />
+                  ) : null}
+                  <span className="relative">{locale === "ar" ? link.ar : link.en}</span>
+                </a>
               );
             })}
           </div>
 
-          <div className="flex items-center gap-1">
-            <ThemeIconButton className="hidden lg:inline-flex" />
-            <button
-              type="button"
-              onClick={toggleLocale}
-              aria-label={locale === "en" ? "Switch language to Arabic" : "التبديل إلى الإنجليزية"}
-              lang={locale === "en" ? "ar" : "en"}
-              className={cn(
-                "hidden h-11 min-w-14 items-center justify-center rounded-full px-3 text-[16px] font-medium leading-5 text-ink lg:inline-flex",
-                "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)] hover:bg-glass-fill active:bg-glass-active",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-                locale === "en" && "font-arabic",
-              )}
+          <div className="flex items-center gap-2">
+            <div className="hidden items-center rounded-full ring-1 ring-inset ring-line lg:flex">
+              <ThemeIconButton />
+              <span aria-hidden="true" className="h-5 w-px bg-line" />
+              <button
+                type="button"
+                onClick={toggleLocale}
+                aria-label={text.switchLanguageLabel}
+                lang={locale === "en" ? "ar" : "en"}
+                className={cn(
+                  "inline-flex h-11 min-w-11 items-center justify-center rounded-full px-3 text-[15px] font-medium leading-5 text-ink",
+                  "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)] hover:bg-glass-fill active:bg-glass-active",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+                  locale === "en" && "font-arabic text-[17px]",
+                )}
+              >
+                {text.switchLanguage}
+              </button>
+            </div>
+
+            <Cta
+              href="#contact"
+              size="sm"
+              className="hidden min-[360px]:inline-flex"
+              onClick={(event) => follow(event, "#contact")}
             >
-              {text.switchLanguage}
-            </button>
-            <Cta href="#contact" onClick={(event) => follow(event, "#contact")}>
               {text.talk}
             </Cta>
+            <a
+              href="#contact"
+              aria-label={text.talk}
+              onClick={(event) => follow(event, "#contact")}
+              className="inline-flex size-11 items-center justify-center rounded-full bg-brand text-on-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg min-[360px]:hidden"
+            >
+              <Mail className="size-5" aria-hidden="true" />
+            </a>
+
             <IconButton
+              ref={burger}
               className="lg:hidden"
-              aria-expanded={isOpen}
+              aria-expanded={shown}
               aria-controls={menuTitleId}
-              onClick={() => setIsOpen(true)}
+              onClick={openMenu}
             >
               <Menu className="block size-5" aria-hidden="true" />
               <span className="sr-only">{text.open}</span>
@@ -194,85 +338,110 @@ export function Navbar() {
         </nav>
       </header>
 
-      {isOpen ? (
+      {mounted ? (
         <div
-          className="fixed inset-0 z-50 flex flex-col bg-bg text-ink lg:hidden"
+          className="fixed inset-0 z-50 lg:hidden"
           role="dialog"
           aria-modal="true"
           aria-labelledby={menuTitleId}
+          onKeyDown={trapTab}
         >
-          <div className="mx-auto flex h-[76px] w-full max-w-[390px] items-center justify-between px-3">
-            <Monogram onClick={(event) => follow(event, "#home")} />
-            <IconButton glass onClick={() => setIsOpen(false)}>
-              <X className="block size-5" aria-hidden="true" />
-              <span className="sr-only">{text.close}</span>
-            </IconButton>
-          </div>
+          <div
+            aria-hidden="true"
+            data-open={shown}
+            onClick={closeMenu}
+            className="menu-scrim absolute inset-0 hidden bg-ink/40 md:block"
+          />
+          <div
+            ref={panel}
+            data-open={shown}
+            style={{ "--ox": `${origin.x}px`, "--oy": `${origin.y}px` } as CSSProperties}
+            className="menu-panel flex flex-col overflow-y-auto bg-bg text-ink"
+          >
+            <div className="flex h-[76px] shrink-0 items-center justify-between px-5 sm:px-8 md:px-6">
+              <Monogram name={text.name} onClick={(event) => follow(event, "#home")} />
+              <IconButton ref={closeButton} glass onClick={closeMenu}>
+                <X className="block size-5" aria-hidden="true" />
+                <span className="sr-only">{text.close}</span>
+              </IconButton>
+            </div>
 
-          <div className="mx-auto flex w-full max-w-[390px] flex-1 flex-col px-5 pb-6">
-            <p
-              id={menuTitleId}
-              className={cn(
-                "pb-3 text-[14px] text-muted",
-                locale === "ar" ? "font-arabic" : "font-mono uppercase tracking-[0.14em]",
-              )}
-            >
-              {text.menu}
-            </p>
-            <ul>
-              {links.map((link, index) => {
-                const isActive =
-                  active === link.href || (link.href === "#experience" && active === "#home");
-                const Arrow = locale === "ar" ? ArrowUpLeft : ArrowUpRight;
-                return (
-                  <li key={link.href} className="border-b border-line">
-                    <a
-                      href={link.href}
-                      aria-current={isActive ? "true" : undefined}
-                      onClick={(event) => follow(event, link.href)}
-                      className="flex h-20 items-center justify-between gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
-                    >
-                      <span className="flex items-center gap-4">
-                        <span className="font-mono text-[14px] text-brand-text">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                        <span className="text-[40px] font-semibold leading-[44px] text-ink">
-                          {locale === "ar" ? link.ar : link.en}
-                        </span>
-                      </span>
-                      <Arrow
-                        aria-hidden="true"
-                        strokeWidth={1.5}
-                        className={cn("size-[22px] shrink-0", isActive ? "text-brand-text" : "text-muted")}
-                      />
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-
-            <div className="mt-auto flex flex-col gap-4 border-t border-line pt-6">
-              <SettingRow label={text.theme}>
-                <ThemeSegment locale={locale} />
-              </SettingRow>
-              <SettingRow label={text.language}>
-                <Segment
-                  value={locale}
-                  onChange={setLocale}
-                  options={[
-                    { value: "en", label: "EN" },
-                    { value: "ar", label: "عربي", arabic: true },
-                  ]}
-                />
-              </SettingRow>
-              <Cta
-                href="#contact"
-                size="lg"
-                fullWidth
-                onClick={(event) => follow(event, "#contact")}
+            <div className="flex w-full flex-1 flex-col px-5 pb-8 sm:px-8 md:px-6">
+              <p
+                id={menuTitleId}
+                className={cn(
+                  "pb-3 text-[14px] text-muted",
+                  locale === "ar" ? "font-arabic" : "font-mono uppercase tracking-[0.14em]",
+                )}
               >
-                {text.talk}
-              </Cta>
+                {text.menu}
+              </p>
+              <ul>
+                {links.map((link, index) => {
+                  const isActive = active === link.href;
+                  const Arrow = locale === "ar" ? ArrowUpLeft : ArrowUpRight;
+                  return (
+                    <li
+                      key={link.href}
+                      className="menu-item border-b border-line"
+                      style={{ "--i": index } as CSSProperties}
+                    >
+                      <a
+                        href={link.href}
+                        aria-current={isActive ? "true" : undefined}
+                        onClick={(event) => follow(event, link.href)}
+                        className="flex h-20 items-center justify-between gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+                      >
+                        <span className="flex items-center gap-4">
+                          <span className="font-mono text-[14px] text-brand-text">
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+                          <span className="text-[40px] font-semibold leading-[44px] text-ink">
+                            {locale === "ar" ? link.ar : link.en}
+                          </span>
+                        </span>
+                        <span className="flex items-center gap-3">
+                          {isActive ? (
+                            <span aria-hidden="true" className="size-2 rounded-full bg-brand" />
+                          ) : null}
+                          <Arrow
+                            aria-hidden="true"
+                            strokeWidth={1.5}
+                            className={cn("size-[22px] shrink-0", isActive ? "text-brand-text" : "text-muted")}
+                          />
+                        </span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              <div
+                className="menu-item mt-8 flex flex-col gap-4 border-t border-line pt-6"
+                style={{ "--i": links.length } as CSSProperties}
+              >
+                <SettingRow label={text.theme}>
+                  <ThemeSegment locale={locale} />
+                </SettingRow>
+                <SettingRow label={text.language}>
+                  <Segment
+                    value={locale}
+                    onChange={setLocale}
+                    options={[
+                      { value: "en", label: "EN" },
+                      { value: "ar", label: "عربي", arabic: true },
+                    ]}
+                  />
+                </SettingRow>
+                <Cta
+                  href="#contact"
+                  size="lg"
+                  fullWidth
+                  onClick={(event) => follow(event, "#contact")}
+                >
+                  {text.talk}
+                </Cta>
+              </div>
             </div>
           </div>
         </div>
@@ -282,29 +451,37 @@ export function Navbar() {
 }
 
 function Monogram({
-  withName = false,
+  name,
+  collapsed = false,
   onClick,
 }: {
-  withName?: boolean;
+  name: string;
+  /** Hides the written name, leaving the AZ mark. Only the header bar uses it. */
+  collapsed?: boolean;
   onClick: (event: MouseEvent<HTMLAnchorElement>) => void;
 }) {
-  const { locale } = useLocale();
-  const name = locale === "ar" ? "عبدالله زغلول" : site.name;
+  const showsName = collapsed !== undefined;
   return (
     <a
       href="#home"
       onClick={onClick}
       aria-label={name}
-      className="flex items-center gap-3 rounded-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+      className="flex h-11 min-w-11 items-center justify-center rounded-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
     >
       <span
         aria-hidden="true"
-        className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-brand text-[17px] font-semibold leading-5 text-on-brand"
+        className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-brand text-[16px] font-semibold leading-5 text-on-brand"
       >
         AZ
       </span>
-      {withName ? (
-        <span className="hidden text-[17px] font-medium leading-[22px] text-ink sm:inline">{name}</span>
+      {showsName ? (
+        <span
+          aria-hidden="true"
+          data-collapsed={collapsed}
+          className="nav-name whitespace-nowrap text-[17px] font-medium leading-[22px] text-ink"
+        >
+          {name}
+        </span>
       ) : null}
     </a>
   );
@@ -378,19 +555,12 @@ function ThemeIconButton({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme();
   const mounted = useMounted();
   const isDark = mounted && theme === "dark";
+  const text = copy[locale];
 
   return (
     <IconButton
       className={className}
-      aria-label={
-        locale === "ar"
-          ? isDark
-            ? "التبديل إلى المظهر الفاتح"
-            : "التبديل إلى المظهر الداكن"
-          : isDark
-            ? "Switch to light theme"
-            : "Switch to dark theme"
-      }
+      aria-label={isDark ? text.toLight : text.toDark}
       onClick={(event) =>
         mounted && changeTheme(() => setTheme(isDark ? "light" : "dark"), event.currentTarget)
       }
