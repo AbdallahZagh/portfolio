@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export interface ChipProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+export type ChipProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(
   ({ className, type, ...props }, ref) => {

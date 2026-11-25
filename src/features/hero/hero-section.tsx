@@ -1,73 +1,89 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Download, Mail } from "lucide-react";
+import { Download } from "lucide-react";
+import { Cta } from "@/components/ui/cta";
+import { useLocale } from "@/components/locale-provider";
 import { publicAsset } from "@/lib/public-asset";
 import { site } from "@/data/portfolio";
-import { fadeInUp, staggerContainer } from "@/lib/animation-variants";
-
-const HeroScene = dynamic(() => import("@/components/three/hero-scene"), {
-  ssr: false,
-});
+import { cn } from "@/lib/utils";
+import { heroCopy } from "./hero-copy";
+import { DashboardBuilder } from "./builder/dashboard-builder";
 
 export function HeroSection() {
+  const { locale, isRtl } = useLocale();
+  const copy = heroCopy[locale];
+  const { lines, accent, accentWord } = copy.headline;
+
   return (
-    <section
-      id="home"
-      className="relative flex min-h-[calc(100dvh-4rem)] flex-col justify-center border-b border-border"
-    >
-      <motion.div
-        className="page-wrap relative z-10 grid w-full flex-1 items-center gap-8 py-8 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-2 lg:gap-8 lg:py-0"
-        initial="hidden"
-        animate="visible"
-        variants={staggerContainer}
-      >
-        <div className="relative z-10">
-          <motion.p
-            className="inline-flex items-center gap-2 text-sm font-medium text-primary"
-            variants={fadeInUp}
+    <section id="home" className="relative">
+      <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 pb-12 pt-6 sm:px-8 xl:grid-cols-[minmax(0,1fr)_536px] xl:gap-8 xl:px-14 xl:pb-0 xl:pt-14">
+        <div className="flex min-w-0 flex-col gap-6 md:gap-8">
+          <p className="text-[15px] font-medium leading-5 text-muted md:text-[16px]">{copy.role}</p>
+
+          <h1
+            className={cn(
+              "font-semibold text-ink",
+              isRtl
+                ? "text-[64px] leading-[83px] sm:text-[80px] sm:leading-[100px] lg:text-[96px] lg:leading-[120px]"
+                : "text-[64px] leading-[58px] tracking-[-0.045em] sm:text-[96px] sm:leading-[84px] md:text-[120px] md:leading-[105px] lg:text-[144px] lg:leading-[126px]",
+            )}
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-spark" />
-            {site.role}
-          </motion.p>
-          <motion.h1
-            className="mt-3 font-display text-[clamp(2.4rem,5.2vw,4.25rem)] font-semibold leading-[1.05] tracking-tight"
-            variants={fadeInUp}
+            {lines.map((line, index) => {
+              if (index !== accent) {
+                return (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                );
+              }
+              if (!accentWord) {
+                return (
+                  <span key={line} className="block text-brand-text">
+                    {line}
+                  </span>
+                );
+              }
+              const [before, after] = line.split(accentWord);
+              return (
+                <span key={line} className="block">
+                  {before}
+                  <span className="text-brand-text">{accentWord}</span>
+                  {after}
+                </span>
+              );
+            })}
+          </h1>
+
+          <p
+            className={cn(
+              "max-w-[560px] text-[18px] leading-[27px] text-muted md:text-[20px]",
+              isRtl && "md:leading-[30px]",
+            )}
           >
-            {site.name}
-          </motion.h1>
-          <motion.p
-            className="mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg"
-            variants={fadeInUp}
-          >
-            {site.bio}
-          </motion.p>
-          <motion.div className="mt-8 flex flex-wrap gap-3" variants={fadeInUp}>
-            <Button href="#contact" size="lg">
-              <Mail className="mr-2 h-4 w-4" />
-              Get in touch
-            </Button>
-            <Button
+            <span className="font-medium text-ink">{copy.leadStrong}</span>
+            <span className="xl:hidden">{copy.leadRestMobile}</span>
+            <span className="hidden xl:inline">{copy.leadRest}</span>
+          </p>
+
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-4 md:gap-x-8">
+            <Cta href="#contact" size="responsive">
+              {copy.talk}
+            </Cta>
+            <a
               href={publicAsset(site.resumeHref)}
               download={site.resumeDownload}
-              variant="outline"
-              size="lg"
+              className="inline-flex h-11 items-center gap-2 border-b-[1.5px] px-1 border-ink text-[17px] font-semibold leading-5 text-ink transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)] hover:border-brand hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
             >
-              <Download className="mr-2 h-4 w-4" />
-              Download CV
-            </Button>
-          </motion.div>
+              <Download className="size-5" aria-hidden="true" />
+              {copy.downloadCv}
+            </a>
+          </div>
         </div>
 
-        <motion.div
-          className="relative mx-auto aspect-square w-full max-w-88 sm:max-w-104 lg:mx-0 lg:aspect-auto lg:h-[min(36rem,calc(100dvh-8rem))] lg:max-w-none"
-          variants={fadeInUp}
-        >
-          <HeroScene />
-        </motion.div>
-      </motion.div>
+        <div className="min-w-0 xl:pt-[9px]">
+          <DashboardBuilder />
+        </div>
+      </div>
     </section>
   );
 }

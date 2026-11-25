@@ -8,7 +8,9 @@ import { site } from "@/data/portfolio";
 import { Cta } from "@/components/ui/cta";
 import { IconButton } from "@/components/ui/icon-button";
 import { NavPillLink } from "@/components/ui/nav-pill-link";
+import { useLocale, type Locale } from "@/components/locale-provider";
 import { cn } from "@/lib/utils";
+import { useMounted } from "@/lib/use-mounted";
 
 const NAV_OFFSET = -90;
 const SECTION_IDS = ["home", "experience", "projects", "skills", "contact"];
@@ -18,8 +20,6 @@ const links = [
   { href: "#projects", en: "Projects", ar: "المشاريع" },
   { href: "#skills", en: "Skills", ar: "المهارات" },
 ] as const;
-
-type Locale = "en" | "ar";
 
 const copy = {
   en: {
@@ -73,10 +73,11 @@ function useScrolledSection() {
   useLenis(syncActive);
 
   useEffect(() => {
-    syncActive();
+    const frame = window.requestAnimationFrame(syncActive);
     window.addEventListener("scroll", syncActive, { passive: true });
     window.addEventListener("resize", syncActive);
     return () => {
+      window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", syncActive);
       window.removeEventListener("resize", syncActive);
     };
@@ -87,16 +88,11 @@ function useScrolledSection() {
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [locale, setLocale] = useState<Locale>("en");
+  const { locale, setLocale } = useLocale();
   const [active, setActive] = useScrolledSection();
   const lenis = useLenis();
   const text = copy[locale];
   const menuTitleId = useId();
-
-  useEffect(() => {
-    document.documentElement.lang = locale === "ar" ? "ar" : "en";
-    document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
-  }, [locale]);
 
   useEffect(() => {
     if (!lenis) return;
@@ -137,7 +133,7 @@ export function Navbar() {
     scrollTo(href);
   };
 
-  const toggleLocale = () => setLocale((current) => (current === "en" ? "ar" : "en"));
+  const toggleLocale = () => setLocale(locale === "en" ? "ar" : "en");
 
   return (
     <>
@@ -353,8 +349,7 @@ function Segment<T extends string>({
 
 function ThemeSegment({ locale }: { locale: Locale }) {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useMounted();
   const current = mounted && theme === "light" ? "light" : "dark";
   const text = copy[locale];
 
@@ -372,8 +367,7 @@ function ThemeSegment({ locale }: { locale: Locale }) {
 
 function ThemeIconButton({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useMounted();
   const isDark = mounted && theme === "dark";
 
   return (

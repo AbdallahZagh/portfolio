@@ -3,6 +3,7 @@ import { Host_Grotesk, JetBrains_Mono, Noto_Sans_Arabic } from "next/font/google
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { LocaleProvider } from "@/components/locale-provider";
 import { publicAsset } from "@/lib/public-asset";
 
 const iconUrl = publicAsset("/logo.png");
@@ -183,7 +184,9 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <SmoothScroll>{children}</SmoothScroll>
+          <LocaleProvider>
+            <SmoothScroll>{children}</SmoothScroll>
+          </LocaleProvider>
         </ThemeProvider>
       </body>
     </html>

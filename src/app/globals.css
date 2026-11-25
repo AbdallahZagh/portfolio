@@ -222,6 +222,46 @@ h6 {
     0 16px 40px -14px rgb(42 48 26 / 0.14);
 }
 
+/* Hero dashboard builder cards: same glass as the navbar, lighter so the panel reads as the main surface. */
+@layer components {
+  .liquid-glass-card {
+    background-color: var(--glass-fill);
+    border-color: var(--glass-stroke);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.8),
+      inset 0 0 8px rgb(255 255 255 / 0.35),
+      inset 0 -2px 6px color-mix(in srgb, var(--brand) 10%, transparent),
+      0 6px 16px -8px rgb(42 48 26 / 0.14);
+  }
+
+  [data-theme="dark"] .liquid-glass-card {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.22),
+      inset 0 0 8px rgb(255 255 255 / 0.06),
+      0 6px 16px -8px rgb(0 0 0 / 0.5);
+  }
+}
+
+/* Tank liquid surface: wave slides sideways, speed set by --wave-speed. */
+@keyframes tank-wave {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.tank-wave {
+  animation: tank-wave var(--wave-speed, 3.2s) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tank-wave {
+    animation: none;
+  }
+}
+
 .page-wrap {
   width: 100%;
   max-width: 72rem;
