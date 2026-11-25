@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { LocaleProvider } from "@/components/locale-provider";
 import { publicAsset } from "@/lib/public-asset";
+import { site, socialLinks } from "@/data/portfolio";
 
 const iconUrl = publicAsset("/logo.png");
 
@@ -35,38 +36,33 @@ const jetbrainsMono = JetBrains_Mono({
   adjustFontFallback: true,
 });
 
+const title = "Abdallah Zaghloul | Frontend Engineer & Technical Lead (React / Next.js)";
+const description =
+  "Frontend engineer and technical lead with 4+ years building production web applications in React, Next.js and TypeScript. Available for worldwide remote opportunities.";
+const ogImage = publicAsset("/og-image.png");
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://abdallahzagh.github.io/portfolio"),
+  metadataBase: new URL(site.url),
   title: {
-    default: "Abdallah Zaghloul - Frontend Developer & Team Lead | React, Next.js, Three.js",
-    template: "%s | Abdallah Zaghloul Portfolio",
+    default: title,
+    template: "%s | Abdallah Zaghloul",
   },
-  description:
-    "Frontend Developer with 3+ years shipping production React and Next.js apps. Led a 3-person remote team at PawsPalConnect, now building IoT dashboards and motion-heavy marketing sites at Sama-Tech. Also ships API and mobile when needed — including Nova across web, Expo, and NestJS.",
+  description,
   keywords: [
     "Abdallah Zaghloul",
-    "Frontend Developer",
+    "Frontend Engineer",
+    "Technical Lead",
     "React",
     "Next.js",
     "TypeScript",
-    "Redux",
-    "Tailwind CSS",
-    "Framer Motion",
-    "Three.js",
     "Remote Frontend Engineer",
-    "Team Lead",
-    "React Developer",
-    "Web Developer",
-    "JavaScript",
-    "UI/UX",
+    "RTL",
+    "Dashboards",
     "Portfolio",
-    "Frontend Architecture",
-    "GSAP",
-    "Performance Optimization",
   ],
-  authors: [{ name: "Abdallah Zaghloul", url: "https://github.com/AbdallahZagh" }],
-  creator: "Abdallah Zaghloul",
-  publisher: "Abdallah Zaghloul",
+  authors: [{ name: site.name, url: "https://github.com/AbdallahZagh" }],
+  creator: site.name,
+  publisher: site.name,
   formatDetection: {
     email: false,
     address: false,
@@ -75,27 +71,24 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://abdallahzagh.github.io/portfolio/",
-    siteName: "Abdallah Zaghloul Portfolio",
-    title: "Abdallah Zaghloul - Frontend Developer & Team Lead",
-    description:
-      "Frontend Developer with 3+ years shipping production React and Next.js apps. IoT dashboards at Sama-Tech, team lead at PawsPalConnect, and Nova across web, Expo, and NestJS.",
+    url: site.url,
+    siteName: "Abdallah Zaghloul",
+    title,
+    description,
     images: [
       {
-        url: "/og-image.jpg", // Add your OG image
+        url: ogImage,
         width: 1200,
         height: 630,
-        alt: "Abdallah Zaghloul - Frontend Developer Portfolio",
+        alt: "Abdallah Zaghloul, Frontend Engineer & Technical Lead",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Abdallah Zaghloul - Frontend Developer & Team Lead",
-    description:
-      "Frontend Developer with 3+ years shipping React and Next.js apps — IoT dashboards, team leadership, and full-stack product work including Nova.",
-    creator: "@AbdallahZagh", // Update with your Twitter handle
-    images: ["/twitter-image.jpg"], // Add your Twitter image
+    title,
+    description,
+    images: [ogImage],
   },
   robots: {
     index: true,
@@ -108,17 +101,32 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    google: "your-google-verification-code", // Add if you have one
-  },
   alternates: {
-    canonical: "https://abdallahzagh.github.io/portfolio/",
+    canonical: site.url,
   },
   icons: {
     icon: [{ url: iconUrl, type: "image/png" }],
     shortcut: [{ url: iconUrl, type: "image/png" }],
     apple: [{ url: iconUrl, type: "image/png" }],
   },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: site.name,
+  jobTitle: site.role,
+  description,
+  url: site.url,
+  sameAs: socialLinks.map((link) => link.url),
+  email: site.email,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Damascus",
+    addressCountry: "SY",
+  },
+  knowsAbout: ["React", "Next.js", "TypeScript", "Frontend Development", "Technical Leadership", "RTL"],
+  worksFor: { "@type": "Organization", name: "Elathr Business", jobTitle: "Technical Lead" },
 };
 
 export default function RootLayout({
@@ -136,48 +144,9 @@ export default function RootLayout({
         <link rel="icon" href={iconUrl} type="image/png" />
         <link rel="shortcut icon" href={iconUrl} type="image/png" />
         <link rel="apple-touch-icon" href={iconUrl} />
-        <link rel="canonical" href="https://abdallahzagh.github.io/portfolio/" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Person",
-              name: "Abdallah Zaghloul",
-              jobTitle: "Frontend Developer & Team Lead",
-              url: "https://abdallahzagh.github.io/portfolio/",
-              sameAs: [
-                "https://github.com/AbdallahZagh",
-                "https://linkedin.com/in/abdallah-zaghloul",
-              ],
-              email: "f2002.a.z@gmail.com",
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "Damascus",
-                addressCountry: "SY",
-              },
-              knowsAbout: [
-                "React",
-                "Next.js",
-                "TypeScript",
-                "Redux",
-                "Tailwind CSS",
-                "Three.js",
-                "Frontend Development",
-                "Team Leadership",
-              ],
-              worksFor: {
-                "@type": "Organization",
-                name: "Sama-Tech",
-                jobTitle: "Frontend Web Developer",
-              },
-            }),
-          }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
-      <body
-        className="antialiased bg-background text-foreground"
-      >
+      <body className="antialiased bg-background text-foreground">
         <ThemeProvider
           attribute="data-theme"
           defaultTheme="dark"

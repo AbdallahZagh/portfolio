@@ -14,15 +14,16 @@ const copy: Record<
   en: {
     title: "Experience",
     aside:
-      "Technical lead for Elathr Business, IoT and fire-safety platforms at Sama-Tech, freelance product work, and frontend leadership at PawsPalConnect.",
+      "Technical lead at Elathr Business, IoT and fire-safety platforms at Sama-Tech, Odoo ERP and web apps as a software developer, and frontend leadership at PawsPalConnect.",
     certificate: "Internship certificate",
     dialog: "Internship certificate",
     close: "Close",
   },
   ar: {
     title: "الخبرة",
+    // AR? aside follows the CV facts (the Figma Arabic aside mentions "freelance", which the CV no longer says)
     aside:
-      "قائد تقني لـ Elathr Business، ومنصات IoT والسلامة من الحرائق في Sama-Tech، وعمل حر على المنتجات، وقيادة الواجهات الأمامية في PawsPalConnect.",
+      "قائد تقني في Elathr Business، ومنصات IoT والسلامة من الحرائق في Sama-Tech، وأنظمة Odoo ERP وتطبيقات ويب كمطوّر برمجيات، وقيادة الواجهات الأمامية في PawsPalConnect.",
     certificate: "شهادة التدريب",
     // AR? not in Figma
     dialog: "شهادة التدريب",
@@ -53,9 +54,11 @@ export function ExperienceSection() {
                 <h3 className="text-[22px] font-semibold leading-7 tracking-[-0.02em] text-ink rtl:leading-[34px] rtl:tracking-normal lg:text-[28px] lg:leading-[34px] rtl:lg:leading-[42px]">
                   {job.title[locale]}
                 </h3>
-                <p className="text-[17px] font-medium leading-[22px] text-brand-text rtl:leading-[26px]">
-                  {job.company[locale]}
-                </p>
+                {job.company ? (
+                  <p className="text-[17px] font-medium leading-[22px] text-brand-text rtl:leading-[26px]">
+                    {job.company[locale]}
+                  </p>
+                ) : null}
                 <ul className="flex flex-wrap gap-2">
                   {job.tags[locale].map((tag) => (
                     <li key={tag}>
@@ -65,12 +68,14 @@ export function ExperienceSection() {
                 </ul>
               </div>
 
-              <div className="flex min-w-0 flex-col items-start gap-2">
-                {job.notes[locale].map((note) => (
-                  <p key={note} className="text-[17px] leading-[26px] text-muted">
-                    {note}
-                  </p>
-                ))}
+              <div className="flex min-w-0 flex-col items-start gap-4">
+                <ul className="flex list-disc flex-col gap-2 ps-[18px] marker:text-line">
+                  {job.bullets[locale].map((bullet) => (
+                    <li key={bullet} className="text-[17px] leading-[26px] text-muted">
+                      {bullet}
+                    </li>
+                  ))}
+                </ul>
                 {job.certificate ? (
                   <CertificatePreview
                     src={job.certificate.src}

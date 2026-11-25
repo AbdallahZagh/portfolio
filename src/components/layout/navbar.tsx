@@ -28,7 +28,7 @@ const copy = {
     light: "Light",
     dark: "Dark",
     language: "Language",
-    talk: "Let's talk",
+    talk: "Get in touch",
     switchLanguage: "عربي",
     close: "Close menu",
     open: "Open menu",
@@ -39,7 +39,7 @@ const copy = {
     light: "فاتح",
     dark: "داكن",
     language: "اللغة",
-    talk: "لنتحدث",
+    talk: "تواصل معي",
     switchLanguage: "EN",
     close: "إغلاق القائمة",
     open: "فتح القائمة",
@@ -137,7 +137,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className="pointer-events-none sticky top-0 z-40 bg-transparent px-4 pt-3 lg:px-8 lg:pt-4">
+      <header className="pointer-events-none fixed inset-x-0 top-0 z-40 bg-transparent px-4 pt-3 lg:px-8 lg:pt-4">
         <nav
           aria-label={locale === "ar" ? "التنقل الرئيسي" : "Primary"}
           className="liquid-glass-pill pointer-events-auto relative mx-auto flex h-16 w-full max-w-[1328px] items-center justify-between rounded-full px-3 lg:h-[70px] lg:px-4"

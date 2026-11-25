@@ -89,11 +89,11 @@ export const heroCopy: Record<Locale, HeroCopy> = {
   en: {
     role: "Frontend Engineer & Technical Lead (React / Next.js) · Damascus, Syria",
     headline: { lines: ["Interfaces", "for live", "data."], accent: 1, accentWord: "live" },
-    leadStrong: "3+ years building production web apps",
-    leadRest: " in React, Next.js and TypeScript. Open to worldwide remote. Try the builder on the right.",
-    leadRestMobile: " in React, Next.js and TypeScript. Open to worldwide remote. Try the builder below.",
-    talk: "Let's talk",
-    downloadCv: "Download CV · PDF",
+    leadStrong: "4+ years building production web applications",
+    leadRest: " in React, Next.js and TypeScript. Available for worldwide remote opportunities.",
+    leadRestMobile: " in React, Next.js and TypeScript. Available for worldwide remote opportunities.",
+    talk: "Get in touch",
+    downloadCv: "Download CV",
     builder: {
       title: "Dashboard builder",
       hintDesktop: "drag to swap · corner to resize",
@@ -171,11 +171,12 @@ export const heroCopy: Record<Locale, HeroCopy> = {
   ar: {
     role: "مهندس واجهات أمامية وقائد تقني (React / Next.js) · دمشق، سوريا",
     headline: { lines: ["واجهات", "للبيانات", "الحيّة."], accent: 1 },
-    leadStrong: "أكثر من 3 سنوات في بناء تطبيقات ويب إنتاجية",
-    leadRest: " باستخدام React وNext.js وTypeScript. متاح للعمل عن بُعد من أي مكان. جرّب أداة البناء على اليسار.",
-    leadRestMobile: " باستخدام React وNext.js وTypeScript. متاح للعمل عن بُعد من أي مكان. جرّب أداة البناء في الأسفل.",
-    talk: "لنتحدث",
-    downloadCv: "تحميل السيرة الذاتية · PDF",
+    leadStrong: "أكثر من 4 سنوات في بناء تطبيقات ويب إنتاجية",
+    // AR? lead, talk and downloadCv follow the CV wording, which Figma's Arabic frame does not have
+    leadRest: " باستخدام React وNext.js وTypeScript. متاح لفرص العمل عن بُعد حول العالم.",
+    leadRestMobile: " باستخدام React وNext.js وTypeScript. متاح لفرص العمل عن بُعد حول العالم.",
+    talk: "تواصل معي",
+    downloadCv: "تحميل السيرة الذاتية",
     builder: {
       title: "أداة بناء اللوحات",
       hintDesktop: "اسحب للتبديل · الزاوية لتغيير الحجم",

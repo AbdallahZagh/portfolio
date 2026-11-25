@@ -1,58 +1,51 @@
 "use client";
 
-import { SectionHeading } from "@/components/ui/section-heading";
-import { Reveal, RevealItem } from "@/components/ui/reveal";
+import { Container } from "@/components/ui/container";
+import { SectionHead } from "@/components/ui/section-heading";
+import { useLocale, type Locale } from "@/components/locale-provider";
 import { education, languages, skillGroups } from "@/data/portfolio";
 
-export function SkillsSection() {
+const copy: Record<Locale, { title: string; aside: string }> = {
+  en: {
+    title: "Skills",
+    aside: "The stack behind production dashboards, builders and bilingual RTL products.",
+  },
+  ar: {
+    title: "المهارات",
+    aside: "الحزمة التقنية وراء لوحات التحكم الإنتاجية والمنشئات والمنتجات ثنائية اللغة RTL.",
+  },
+};
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <section id="skills" className="border-b border-border py-16 md:py-24">
-      <Reveal className="page-wrap">
-        <SectionHeading
-          title="Skills"
-          aside="Frontend, motion, backend, and mobile — the stack behind production dashboards, marketing sites, and Nova."
-        />
+    <div className="grid gap-2 border-b border-line py-5 lg:grid-cols-[312px_minmax(0,1fr)] lg:gap-6 lg:py-6">
+      <dt className="text-[16px] font-medium leading-6 text-muted lg:leading-7">{label}</dt>
+      <dd className="text-[18px] leading-[27px] text-ink lg:text-[20px] lg:leading-7">{children}</dd>
+    </div>
+  );
+}
 
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+export function SkillsSection() {
+  const { locale } = useLocale();
+  const text = copy[locale];
+
+  return (
+    <section id="skills" aria-labelledby="skills-title" className="pt-20 md:pt-40">
+      <Container>
+        <SectionHead id="skills-title" title={text.title} aside={text.aside} />
+        <dl>
           {skillGroups.map((group) => (
-            <RevealItem key={group.title}>
-              <h3 className="font-display text-lg font-semibold tracking-tight">
-                {group.title}
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
-                {group.skills.join(" · ")}
-              </p>
-            </RevealItem>
+            <Row key={group.id} label={group.label[locale]}>
+              {/* Latin tool names stay LTR inside RTL text */}
+              <span dir="ltr" className="block rtl:text-right">
+                {group.items.join(" · ")}
+              </span>
+            </Row>
           ))}
-        </div>
-
-        <div className="mt-16 grid gap-12 border-t border-border pt-12 md:grid-cols-2">
-          <RevealItem>
-            <h3 className="font-display text-lg font-semibold tracking-tight">
-              Academic History
-            </h3>
-            <p className="mt-3 text-sm text-muted">{education.date}</p>
-            <p className="mt-1 font-medium">{education.degree}</p>
-            <p className="mt-1 text-sm text-muted">{education.institution}</p>
-          </RevealItem>
-          <RevealItem>
-            <h3 className="font-display text-lg font-semibold tracking-tight">
-              Languages
-            </h3>
-            <ul className="mt-3 space-y-2">
-              {languages.map((language) => (
-                <li
-                  key={language.name}
-                  className="flex items-baseline justify-between gap-4 text-sm md:justify-start md:gap-8"
-                >
-                  <span className="font-medium">{language.name}</span>
-                  <span className="text-muted">{language.level}</span>
-                </li>
-              ))}
-            </ul>
-          </RevealItem>
-        </div>
-      </Reveal>
+          <Row label={education.label[locale]}>{education.value[locale]}</Row>
+          <Row label={languages.label[locale]}>{languages.value[locale]}</Row>
+        </dl>
+      </Container>
     </section>
   );
 }
