@@ -9,7 +9,7 @@ export function ThemeProvider({
   ...props
 }: React.ComponentProps<typeof NextThemesProvider>) {
   return (
-    <NextThemesProvider attribute="class" {...props}>
+    <NextThemesProvider attribute="data-theme" {...props}>
       <MotionConfig reducedMotion="user">{children}</MotionConfig>
     </NextThemesProvider>
   );

@@ -2,51 +2,157 @@
 @plugin "tailwindcss-animate";
 @import "lenis/dist/lenis.css";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-card: var(--card);
-  --color-muted: var(--muted);
-  --color-border: var(--border);
+  --color-bg: var(--bg);
   --color-surface: var(--surface);
-  --color-spark: var(--spark);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-brand-text: var(--brand-text);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-press: var(--brand-press);
+  --color-tint: var(--tint);
+  --color-on-brand: var(--on-brand);
+  --color-grid: var(--grid);
+  --color-deep: var(--deep);
+  --color-on-deep: var(--on-deep);
+  --color-on-deep-hover: var(--on-deep-hover);
+  --color-on-deep-press: var(--on-deep-press);
+  --color-field: var(--field);
+  --color-field-line: var(--field-line);
+  --color-chip-press: var(--chip-press);
+  --color-disabled-bg: var(--disabled-bg);
+  --color-disabled-fg: var(--disabled-fg);
+  --color-error-on-deep: var(--error-on-deep);
+  --color-glass-fill: var(--glass-fill);
+  --color-glass-active: var(--glass-active);
+  --color-glass-stroke: var(--glass-stroke);
+  --color-glass-fill-strong: var(--glass-fill-strong);
 
-  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-  --font-body: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  /* Existing utilities resolve to the Figma palette until each section is rebuilt. */
+  --color-background: var(--bg);
+  --color-foreground: var(--ink);
+  --color-primary: var(--brand);
+  --color-primary-foreground: var(--on-brand);
+  --color-secondary: var(--deep);
+  --color-secondary-foreground: var(--on-deep);
+  --color-card: var(--surface);
+  --color-border: var(--line);
+  --color-spark: var(--brand);
+
+  --font-sans: var(--font-host-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-host-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-host-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-arabic: var(--font-noto-sans-arabic), var(--font-host-grotesk), sans-serif;
 }
 
 :root {
-  --background: #f2eee3;
-  --foreground: #1a2114;
-  --primary: #3a4d26;
-  --primary-foreground: #f2eee3;
-  --secondary: #6f7f3a;
-  --secondary-foreground: #f2eee3;
-  --card: #faf7ee;
-  --muted: #6b705c;
-  --border: #d6d0be;
-  --surface: #e7e1d1;
-  --spark: #4a6829;
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --space-96: 96px;
+  --space-128: 128px;
+  --space-192: 192px;
+
+  --radius-tag: 999px;
+  --radius-button: 999px;
+  --radius-widget: 10px;
+  --radius-chip: 10px;
+  --radius-card: 18px;
+  --radius-media: 14px;
+  --radius-contact: 24px;
+
+  --layout-desktop-width: 1440px;
+  --layout-desktop-margin: 60px;
+  --layout-mobile-width: 390px;
+  --layout-mobile-margin: 20px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring-snap: cubic-bezier(0.3, 1.3, 0.5, 1);
+  --ease-toggle: cubic-bezier(0.3, 1.4, 0.5, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --duration-theme: 600ms;
+  --duration-reveal: 700ms;
+  --duration-reveal-stagger: 70ms;
+  --duration-snap: 420ms;
+  --duration-preview: 300ms;
+  --duration-ghost: 200ms;
+  --duration-hover: 180ms;
+  --duration-row-indent: 180ms;
+  --duration-morph: 500ms;
+  --spring-stiffness: 420;
+  --spring-damping: 32;
+  --follow-preview-lerp: 0.14;
 }
 
-.dark {
-  --background: #111211;
-  --surface: #151714;
-  --card: #1a1c18;
-  --border: #2d312a;
-  --foreground: #f5f3ee;
-  --muted: #a5aba0;
-  --primary: #aec48f;
-  --primary-foreground: #12170d;
-  --secondary: #27331e;
-  --secondary-foreground: #c2d4ad;
-  --spark: #c5e86c;
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f2ec;
+  --surface: #ffffff;
+  --ink: #151710;
+  --muted: #5b5e52;
+  --line: #dcdcd0;
+  --brand: #55652a;
+  --brand-text: #4a5925;
+  --brand-hover: #4a5925;
+  --brand-press: #3e4b1f;
+  --tint: #e4e8d3;
+  --on-brand: #ffffff;
+  --grid: #e8e8df;
+  --deep: #55652a;
+  --on-deep: #ffffff;
+  --on-deep-hover: #eef0e4;
+  --on-deep-press: #e4e8d3;
+  --field: #ffffff24;
+  --field-line: #ffffff99;
+  --chip-press: #d5dcbc;
+  --disabled-bg: #e6e5dd;
+  --disabled-fg: #76796c;
+  --error-on-deep: #f6e0b5;
+  --glass-fill: #ffffff33;
+  --glass-active: #ffffffb3;
+  --glass-stroke: #ffffffe6;
+  --glass-fill-strong: #ffffff52;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #11120e;
+  --surface: #1a1c16;
+  --ink: #edeee6;
+  --muted: #9ea192;
+  --line: #2b2e24;
+  --brand: #a9bc6a;
+  --brand-text: #b8ca78;
+  --brand-hover: #b8ca78;
+  --brand-press: #c6d68c;
+  --tint: #262b19;
+  --on-brand: #11120e;
+  --grid: #1e2019;
+  --deep: #3a4520;
+  --on-deep: #f2eee8;
+  --on-deep-hover: #e4e2d8;
+  --on-deep-press: #d6d3c7;
+  --field: #ffffff14;
+  --field-line: #ffffff73;
+  --chip-press: #323920;
+  --disabled-bg: #22251d;
+  --disabled-fg: #7f8275;
+  --error-on-deep: #f0d5a0;
+  --glass-fill: #ffffff0f;
+  --glass-active: #ffffff1f;
+  --glass-stroke: #ffffff33;
+  --glass-fill-strong: #1a1c1673;
 }
 
 html {
@@ -66,16 +172,20 @@ html.lenis body {
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: var(--bg);
+  color: var(--ink);
   font-family: var(--font-body);
   transition: background-color 0.3s ease, color 0.3s ease;
   line-height: 1.65;
 }
 
+[dir="rtl"] body {
+  font-family: var(--font-arabic);
+}
+
 ::selection {
-  background: var(--primary);
-  color: var(--primary-foreground);
+  background: var(--brand);
+  color: var(--on-brand);
 }
 
 h1,
@@ -87,6 +197,10 @@ h6 {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.03em;
+}
+
+[dir="rtl"] :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-arabic);
 }
 
 .page-wrap {

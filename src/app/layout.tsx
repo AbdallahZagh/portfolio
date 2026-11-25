@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Host_Grotesk, JetBrains_Mono, Noto_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SmoothScroll } from "@/components/smooth-scroll";
@@ -7,19 +7,30 @@ import { publicAsset } from "@/lib/public-asset";
 
 const iconUrl = publicAsset("/logo.png");
 
-const inter = Inter({
+const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
-  variable: "--font-body",
+  weight: "variable",
+  variable: "--font-host-grotesk",
   display: "swap",
   preload: true,
   adjustFontFallback: true,
 });
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-display",
+const notoSansArabic = Noto_Sans_Arabic({
+  subsets: ["arabic"],
+  weight: "variable",
+  variable: "--font-noto-sans-arabic",
   display: "swap",
   preload: true,
+  adjustFontFallback: true,
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: "variable",
+  variable: "--font-jetbrains-mono",
+  display: "swap",
+  preload: false,
   adjustFontFallback: true,
 });
 
@@ -115,7 +126,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${hostGrotesk.variable} ${notoSansArabic.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <link rel="icon" href={iconUrl} type="image/png" />
         <link rel="shortcut icon" href={iconUrl} type="image/png" />
@@ -160,10 +175,10 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${spaceGrotesk.variable} antialiased bg-background text-foreground`}
+        className="antialiased bg-background text-foreground"
       >
         <ThemeProvider
-          attribute="class"
+          attribute="data-theme"
           defaultTheme="dark"
           enableSystem={false}
           disableTransitionOnChange
