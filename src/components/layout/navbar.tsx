@@ -12,7 +12,7 @@ import {
   type ReactNode,
 } from "react";
 import { ArrowUpLeft, ArrowUpRight, Mail, Menu, Moon, Sun, X } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 import { useLenis } from "lenis/react";
 import { useTheme } from "next-themes";
 import { site } from "@/data/portfolio";
@@ -271,7 +271,7 @@ export function Navbar() {
                   )}
                 >
                   {isActive ? (
-                    <motion.span
+                    <m.span
                       layoutId="nav-active-pill"
                       aria-hidden="true"
                       className="absolute inset-0 rounded-full bg-glass-active ring-1 ring-inset ring-glass-stroke"

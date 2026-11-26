@@ -7,7 +7,8 @@ import { LocaleProvider } from "@/components/locale-provider";
 import { publicAsset } from "@/lib/public-asset";
 import { site, socialLinks } from "@/data/portfolio";
 
-const iconUrl = publicAsset("/logo.png");
+const iconUrl = publicAsset("/icon-48.png");
+const appleIconUrl = publicAsset("/icon-192.png");
 
 const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
@@ -23,7 +24,7 @@ const notoSansArabic = Noto_Sans_Arabic({
   weight: "variable",
   variable: "--font-noto-sans-arabic",
   display: "swap",
-  preload: true,
+  preload: false,
   adjustFontFallback: true,
 });
 
@@ -107,7 +108,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [{ url: iconUrl, type: "image/png" }],
     shortcut: [{ url: iconUrl, type: "image/png" }],
-    apple: [{ url: iconUrl, type: "image/png" }],
+    apple: [{ url: appleIconUrl, type: "image/png" }],
   },
 };
 
@@ -141,9 +142,6 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <link rel="icon" href={iconUrl} type="image/png" />
-        <link rel="shortcut icon" href={iconUrl} type="image/png" />
-        <link rel="apple-touch-icon" href={iconUrl} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
       <body className="antialiased bg-background text-foreground">

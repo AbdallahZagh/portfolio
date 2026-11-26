@@ -48,7 +48,7 @@ export function HeroPreview({ className }: { className?: string }) {
       <a
         href="#projects"
         className="hero-rise group block overflow-hidden rounded-[18px] border border-line bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
-        style={{ "--at": "560ms" } as CSSProperties}
+        style={{ "--at": "280ms" } as CSSProperties}
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- publicAsset path must match basePath */}
         <img
@@ -56,7 +56,8 @@ export function HeroPreview({ className }: { className?: string }) {
           alt={project.image.alt[locale]}
           width={project.image.width}
           height={project.image.height}
-          decoding="async"
+          decoding="sync"
+          fetchPriority="high"
           draggable={false}
           className="block aspect-[1248/672] w-full object-cover"
         />

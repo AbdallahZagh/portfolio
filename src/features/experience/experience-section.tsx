@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll } from "framer-motion";
+import { m, useReducedMotion, useScroll } from "framer-motion";
 import { useRef } from "react";
 import { Reveal } from "@/components/ui/reveal";
 import { Badge } from "@/components/ui/badge";
@@ -52,7 +52,7 @@ export function ExperienceSection() {
         <div ref={listRef} className="relative">
           {/* Scroll-linked timeline: a hairline at the start edge that fills as the list scrolls past. */}
           <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 -start-3 hidden w-px bg-line min-[1100px]:block">
-            <motion.span
+            <m.span
               className="absolute inset-x-0 top-0 h-full origin-top bg-brand"
               style={{ scaleY: reduce ? 1 : progress }}
             />

@@ -178,7 +178,7 @@ export const experiences: Experience[] = [
       ],
     },
     certificate: {
-      src: "/ppc-certificate.png",
+      src: "/ppc-certificate.webp",
       alt: {
         en: "Internship completion certificate — Paws Pal Connect (NPT Solutions), Front-End Team Lead Intern, Abdallah Zaghloul, October 2025 to February 2026",
         ar: "شهادة إتمام التدريب — Paws Pal Connect (NPT Solutions)، متدرّب قائد فريق الواجهات الأمامية، عبدالله زغلول، من أكتوبر 2025 إلى فبراير 2026",
@@ -251,7 +251,7 @@ export const featuredProject: FeaturedProject = {
   },
   tags: ["Next.js 16", "Expo", "WinUI 3", "NestJS 11"],
   image: {
-    src: "/nova-screenshot.png",
+    src: "/nova-screenshot.webp",
     alt: {
       en: "Nova task board: the Aurora Launch project with To Do, In Progress, In Review and Completed columns",
       ar: "لوحة مهام Nova: مشروع Aurora Launch بأعمدة للمهام المطلوبة وقيد التنفيذ وقيد المراجعة والمكتملة",
@@ -261,7 +261,7 @@ export const featuredProject: FeaturedProject = {
   },
   sideImages: {
     left: {
-      src: "/nova-light.png",
+      src: "/nova-light.webp",
       alt: {
         en: "Nova dashboard in light mode, showing the last project, last whiteboard and tasks due today",
         ar: "لوحة Nova في الوضع الفاتح تعرض آخر مشروع وآخر سبورة والمهام المستحقة اليوم",
@@ -270,7 +270,7 @@ export const featuredProject: FeaturedProject = {
       height: 580,
     },
     right: {
-      src: "/nova-timeline.png",
+      src: "/nova-timeline.webp",
       alt: {
         en: "Nova timeline calendar with tasks and subscription charges color-coded by status",
         ar: "التقويم الزمني في Nova مع المهام ورسوم الاشتراكات ملوّنة حسب الحالة",

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ArrowUpRight, X } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { useLenis } from "lenis/react";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
@@ -80,7 +80,7 @@ export function CertificatePreview({ src, alt, label, dialogTitle, closeLabel }:
                   className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden p-3 sm:p-6"
                   role="presentation"
                 >
-                  <motion.div
+                  <m.div
                     className="absolute inset-0 bg-ink/60 backdrop-blur-sm"
                     onClick={closeModal}
                     aria-hidden
@@ -89,7 +89,7 @@ export function CertificatePreview({ src, alt, label, dialogTitle, closeLabel }:
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   />
-                  <motion.div
+                  <m.div
                     role="dialog"
                     aria-modal="true"
                     aria-label={dialogTitle}
@@ -114,7 +114,7 @@ export function CertificatePreview({ src, alt, label, dialogTitle, closeLabel }:
                         draggable={false}
                       />
                     </div>
-                  </motion.div>
+                  </m.div>
                 </div>
               ) : null}
             </AnimatePresence>,

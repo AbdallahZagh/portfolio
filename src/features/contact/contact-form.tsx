@@ -1,7 +1,6 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
-import emailjs from "@emailjs/browser";
 import { Check, Loader2 } from "lucide-react";
 import { useLocale, type Locale } from "@/components/locale-provider";
 import { site } from "@/data/portfolio";
@@ -142,6 +141,8 @@ export function ContactForm({ className }: { className?: string }) {
 
     setStatus("sending");
     try {
+      // Loaded on first send only, so visitors who never write do not download it.
+      const { default: emailjs } = await import("@emailjs/browser");
       const result = await emailjs.send(
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,

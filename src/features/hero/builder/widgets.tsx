@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { HeroCopy } from "../hero-copy";
 import type { Size, WidgetId } from "./layout";
@@ -481,7 +481,7 @@ function VitalsWidget({ copy, size }: WidgetProps) {
 
 function Core({ pulsing, className }: { pulsing: boolean; className?: string }) {
   return (
-    <motion.svg
+    <m.svg
       viewBox="0 0 100 100"
       className={cn("shrink-0", className)}
       aria-hidden="true"
@@ -493,7 +493,7 @@ function Core({ pulsing, className }: { pulsing: boolean; className?: string }) 
       <circle cx="50" cy="50" r="31.5" fill="none" className="stroke-grid" strokeWidth="1.5" />
       <circle cx="50" cy="50" r="23" fill="none" className="stroke-grid" strokeWidth="1.5" />
       <circle cx="50" cy="50" r="20" className="fill-tint stroke-brand" strokeWidth="1.5" />
-    </motion.svg>
+    </m.svg>
   );
 }
 
