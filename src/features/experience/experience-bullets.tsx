@@ -3,20 +3,20 @@
 import { useId, useState, type CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
-/** Bullets shown before the "Show all" toggle on phones. Wider screens always show every bullet. */
-const PREVIEW_COUNT = 3;
 
 type Props = {
   bullets: string[];
   showAll: (count: number) => string;
   showLess: string;
+  /** Bullets shown on phones before the "Show all" toggle. Wider screens always show every bullet. */
+  previewCount?: number;
 };
 
-export function ExperienceBullets({ bullets, showAll, showLess }: Props) {
+export function ExperienceBullets({ bullets, showAll, showLess, previewCount = 3 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const extraId = useId();
-  const head = bullets.slice(0, PREVIEW_COUNT);
-  const rest = bullets.slice(PREVIEW_COUNT);
+  const head = bullets.slice(0, previewCount);
+  const rest = bullets.slice(previewCount);
 
   const itemClass = "reveal-item text-[17px] leading-[26px] text-muted";
   const listClass = "flex list-disc flex-col gap-2 ps-[18px] marker:text-line";
@@ -25,7 +25,11 @@ export function ExperienceBullets({ bullets, showAll, showLess }: Props) {
     <div className="flex w-full min-w-0 flex-col items-start">
       <ul className={cn(listClass, "w-full")}>
         {head.map((bullet, index) => (
-          <li key={bullet} className={itemClass} style={{ "--i": index } as CSSProperties}>
+          <li
+            key={bullet}
+            // Folded roles show at most three lines per bullet on phones.
+            className={cn(itemClass, rest.length > 0 && !expanded && "max-md:line-clamp-3")} style={{ "--i": index } as CSSProperties}
+          >
             {bullet}
           </li>
         ))}
@@ -43,7 +47,7 @@ export function ExperienceBullets({ bullets, showAll, showLess }: Props) {
           >
             <ul className={cn(listClass, "min-h-0 overflow-hidden pt-2")}>
               {rest.map((bullet, index) => (
-                <li key={bullet} className={itemClass} style={{ "--i": index + PREVIEW_COUNT } as CSSProperties}>
+                <li key={bullet} className={itemClass} style={{ "--i": index + previewCount } as CSSProperties}>
                   {bullet}
                 </li>
               ))}
@@ -56,7 +60,7 @@ export function ExperienceBullets({ bullets, showAll, showLess }: Props) {
             onClick={() => setExpanded((value) => !value)}
             className="mt-1 inline-flex min-h-11 items-center text-[16px] font-semibold leading-6 text-brand-text underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand md:hidden"
           >
-            {expanded ? showLess : showAll(rest.length + PREVIEW_COUNT)}
+            {expanded ? showLess : showAll(rest.length + previewCount)}
           </button>
         </>
       ) : null}

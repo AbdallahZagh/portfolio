@@ -298,7 +298,7 @@ export function ContactSection() {
       variant="scale"
       id="contact"
       aria-labelledby="contact-title"
-      className="mt-20 bg-contact-bg text-contact-ink md:mt-40"
+      className="mt-14 scroll-mt-[88px] bg-contact-bg text-contact-ink md:mt-20"
     >
       <Container className="py-16 md:py-24 lg:py-[120px]">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-start lg:gap-20">

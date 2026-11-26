@@ -17,8 +17,8 @@ export function HeroSection() {
   const { lines, accent, accentWord } = copy.headline;
 
   return (
-    <section id="home" className="relative flex min-h-svh items-center">
-      <div className="mx-auto grid w-full max-w-[1440px] items-center gap-10 px-5 py-28 sm:px-8 md:gap-12 xl:grid-cols-12 xl:gap-8 xl:px-14 xl:py-24">
+    <section id="home" className="relative flex scroll-mt-[88px] items-center lg:min-h-svh">
+      <div className="mx-auto grid w-full max-w-[1440px] items-center gap-10 px-5 pb-12 pt-28 min-[375px]:px-6 sm:px-8 md:gap-12 md:pb-16 xl:grid-cols-12 xl:gap-8 xl:px-14 xl:py-24">
         {/* Text takes columns 1-6. It is a size container, so the headline scales to its own width and can never run under the builder. */}
         <div className="flex min-w-0 flex-col gap-6 [container-type:inline-size] md:gap-8 xl:col-span-6">
           <p

@@ -2,6 +2,7 @@
 
 import { m, useReducedMotion, useScroll } from "framer-motion";
 import { useRef } from "react";
+import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/ui/reveal";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
@@ -45,7 +46,7 @@ export function ExperienceSection() {
   const { scrollYProgress: progress } = useScroll({ target: listRef, offset: ["start 70%", "end 55%"] });
 
   return (
-    <section id="experience" aria-labelledby="experience-title" className="pt-20 md:pt-40">
+    <section id="experience" aria-labelledby="experience-title" className="scroll-mt-[88px] py-14 md:py-20">
       <Container>
         <SectionHead id="experience-title" title={text.title} aside={text.aside} />
 
@@ -58,7 +59,7 @@ export function ExperienceSection() {
             />
           </span>
         <ol>
-          {experiences.map((job) => (
+          {experiences.map((job, jobIndex) => (
             <Reveal
               as="li"
               key={job.id}
@@ -77,7 +78,7 @@ export function ExperienceSection() {
                     {job.company[locale]}
                   </p>
                 ) : null}
-                <ul className="flex flex-wrap gap-2">
+                <ul className={cn("flex flex-wrap gap-2", jobIndex >= 3 && "max-md:hidden")}>
                   {job.tags[locale].map((tag) => (
                     <li key={tag}>
                       <Badge>{tag}</Badge>
@@ -87,7 +88,13 @@ export function ExperienceSection() {
               </div>
 
               <div className="flex min-w-0 flex-col items-start gap-4">
-                <ExperienceBullets bullets={job.bullets[locale]} showAll={text.showAll} showLess={text.showLess} />
+                <ExperienceBullets
+                  bullets={job.bullets[locale]}
+                  showAll={text.showAll}
+                  showLess={text.showLess}
+                  // Older roles open as title, dates and a single line on phones.
+                  previewCount={jobIndex >= 3 ? 1 : 2}
+                />
                 {job.certificate ? (
                   <CertificatePreview
                     src={job.certificate.src}

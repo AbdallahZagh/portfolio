@@ -293,7 +293,7 @@ export function ProjectsSection() {
   }, [lastId, locale]);
 
   return (
-    <section id="projects" aria-labelledby="projects-title" className="pt-20 md:pt-40">
+    <section id="projects" aria-labelledby="projects-title" className="scroll-mt-[88px] py-14 md:py-20">
       <Container>
         <SectionHead id="projects-title" title={text.title} aside={text.aside} />
         <FeaturedProject text={text} />

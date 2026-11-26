@@ -93,7 +93,7 @@ export function SkillsSection() {
   const text = copy[locale];
 
   return (
-    <section id="skills" aria-labelledby="skills-title" className="pt-20 md:pt-40">
+    <section id="skills" aria-labelledby="skills-title" className="scroll-mt-[88px] py-14 md:py-20">
       <Container>
         <SectionHead id="skills-title" title={text.title} aside={text.aside} />
         <dl>
