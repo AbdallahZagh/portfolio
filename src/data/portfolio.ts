@@ -568,3 +568,43 @@ export const skillChipGroups: SkillChipGroup[] = [
     },
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Bidi: Latin runs inside Arabic text
+// ---------------------------------------------------------------------------
+
+const LATIN_WORD = String.raw`\.?[A-Za-z](?:[A-Za-z0-9+#./_-]*[A-Za-z0-9+#])?`;
+const LATIN_NUMBER = String.raw`[0-9]+(?:[./][0-9]+)*\+?`;
+const LATIN_PAREN = String.raw`\(${LATIN_WORD}(?: +(?:${LATIN_WORD}|${LATIN_NUMBER}))*\)`;
+const LATIN_RUN = new RegExp(
+  String.raw`(?:${LATIN_WORD}|${LATIN_PAREN})(?: +(?:${LATIN_WORD}|${LATIN_NUMBER}|${LATIN_PAREN}))*`,
+  "g",
+);
+
+/**
+ * Wraps every Latin run (product names, versions, ".NET 8", "Expo (React Native)") in a left-to-right
+ * isolate so punctuation, digits and parentheses next to it cannot jump across in right-to-left lines.
+ * Text that already carries isolates (dates from `ltr()`) is left alone.
+ */
+export function isolateLatin(text: string): string {
+  if (text.includes("\u2066")) return text;
+  return text.replace(LATIN_RUN, (run) => `\u2066${run}\u2069`);
+}
+
+/** Walks the content tree once and isolates the Arabic side of every { en, ar } pair, in place. */
+function isolateArabicContent(node: unknown): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    node.forEach(isolateArabicContent);
+    return;
+  }
+  const record = node as Record<string, unknown>;
+  for (const [key, value] of Object.entries(record)) {
+    if (key === "ar" && typeof value === "string") record[key] = isolateLatin(value);
+    else if (key === "ar" && Array.isArray(value) && value.every((item) => typeof item === "string")) {
+      record[key] = (value as string[]).map(isolateLatin);
+    } else isolateArabicContent(value);
+  }
+}
+
+isolateArabicContent([experiences, featuredProject, projectRows, skillChipGroups, education, languages]);

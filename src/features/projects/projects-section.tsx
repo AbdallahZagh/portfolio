@@ -115,7 +115,7 @@ function BulletGroup({ heading, items }: { heading?: string; items: string[] }) 
   return (
     <div className="flex max-w-[680px] flex-col gap-3">
       {heading ? (
-        <p className="text-[14px] font-medium uppercase leading-[18px] tracking-[0.08em] text-brand-text rtl:tracking-normal">
+        <p className="text-[14px] font-medium uppercase leading-[18px] tracking-[0.08em] text-brand-text rtl:normal-case rtl:tracking-normal">
           {heading}
         </p>
       ) : null}

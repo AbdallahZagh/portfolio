@@ -660,3 +660,12 @@ html.theme-switching body {
 .reveal[data-reveal="plain"][data-state="pending"] { opacity: 1; }
 
 .reveal[data-reveal="soft"][data-state="pending"] { translate: 0 8px; }
+
+/* Arabic needs more room between lines than the Latin sizes in the design give it. */
+[dir="rtl"] :is(p, li, dd, dt, label) {
+  line-height: 1.7;
+}
+[dir="rtl"] :is(h1, h2, h3, h4, h5, h6) {
+  letter-spacing: 0;
+  text-transform: none;
+}
