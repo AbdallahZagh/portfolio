@@ -455,7 +455,6 @@ function Monogram({
     <a
       href="#home"
       onClick={onClick}
-      aria-label={name}
       className="flex h-11 min-w-11 items-center gap-3 rounded-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
     >
       <span
@@ -464,6 +463,7 @@ function Monogram({
       >
         AZ
       </span>
+      <span className="sr-only">{name}</span>
       {withName ? (
         <span aria-hidden="true" className="hidden text-[17px] font-medium leading-[22px] text-ink sm:inline">
           {name}
