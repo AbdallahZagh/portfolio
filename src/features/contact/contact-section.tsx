@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { ArrowUpLeft, ArrowUpRight, Check, Copy, Mail, MessageSquare, X } from "lucide-react";
+import { useLenis } from "lenis/react";
 import { ContactForm } from "./contact-form";
 import { Container } from "@/components/ui/container";
 import { useLocale, type Locale } from "@/components/locale-provider";
@@ -9,125 +11,273 @@ import { cn } from "@/lib/utils";
 
 type ContactCopy = {
   eyebrow: string;
-  lede: string;
+  headline: string;
+  availability: string;
+  emailLabel: string;
   copy: string;
   copied: string;
+  openMail: string;
   phone: string;
-  github: string;
-  linkedin: string;
   basedIn: string;
   basedInValue: string;
-  arrow: string;
+  write: string;
+  sheetTitle: string;
+  close: string;
 };
 
 const copy: Record<Locale, ContactCopy> = {
   en: {
     eyebrow: "Contact",
-    lede: "Let's build something. The quickest way is email.",
+    headline: "Let's build something together.",
+    availability: "Available for worldwide remote opportunities.",
+    emailLabel: "Email",
     copy: "Copy",
     copied: "Copied",
+    openMail: "Open in your email app",
     phone: "Phone",
-    github: "GitHub",
-    linkedin: "LinkedIn",
     basedIn: "Based in",
     basedInValue: "Damascus · UTC+3 · remote worldwide",
-    arrow: "↗",
+    write: "Write a message",
+    sheetTitle: "Send a message",
+    close: "Close",
   },
   ar: {
     eyebrow: "تواصل",
-    lede: "لنبنِ شيئًا معًا. أسرع طريقة هي البريد الإلكتروني.",
+    headline: "لنبنِ شيئًا معًا.",
+    availability: "متاح لفرص العمل عن بُعد حول العالم.",
+    emailLabel: "البريد الإلكتروني",
     copy: "نسخ",
     copied: "تم النسخ",
+    openMail: "فتح في تطبيق البريد",
     phone: "الهاتف",
-    github: "GitHub",
-    linkedin: "LinkedIn",
     basedIn: "المقر",
     basedInValue: `دمشق · ${ltr("UTC+3")} · عن بُعد من أي مكان`,
-    arrow: "↖",
+    write: "اكتب رسالة",
+    sheetTitle: "أرسل رسالة",
+    close: "إغلاق",
   },
 };
 
-const linkedinShort = "in/abdallah-zagh";
+const focusRing =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-contact-accent";
 
-/** Lets long URLs wrap after a slash (as in Figma) instead of in the middle of a word. */
-const breakable = (value: string) => value.replace(/\//g, "/\u200b");
-
-function CopyButton({ value, label, doneLabel }: { value: string; label: string; doneLabel: string }) {
+/** The address as one large line: tap to copy, label flips to "Copied" for two seconds. */
+function EmailCopy({ text }: { text: ContactCopy }) {
   const [copied, setCopied] = useState(false);
-  const [touched, setTouched] = useState(false);
   const timer = useRef<number | undefined>(undefined);
-
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const onCopy = async () => {
     try {
-      await navigator.clipboard.writeText(value);
+      await navigator.clipboard.writeText(site.email);
     } catch {
       const area = document.createElement("textarea");
-      area.value = value;
+      area.value = site.email;
       document.body.appendChild(area);
       area.select();
       document.execCommand("copy");
       document.body.removeChild(area);
     }
-    setTouched(true);
     setCopied(true);
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setCopied(false), 1600);
+    timer.current = window.setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <button
-      type="button"
-      onClick={onCopy}
-      className="inline-flex h-10 shrink-0 items-center rounded-full border border-contact-line px-[17px] text-[14px] font-semibold leading-[18px] text-contact-ink transition-colors duration-[var(--duration-hover)] hover:border-contact-accent hover:text-contact-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-contact-accent"
-    >
-      <span aria-live="polite">
-        <span key={String(copied)} className={touched ? "swap-in" : undefined}>
-          {copied ? doneLabel : label}
+    <div dir="ltr" className="flex items-stretch gap-2">
+      <button
+        type="button"
+        onClick={onCopy}
+        className={cn(
+          "group flex min-h-14 min-w-0 flex-1 items-center justify-between gap-3 rounded-[14px] border border-contact-line px-4 text-start",
+          "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)] hover:border-contact-accent",
+          focusRing,
+        )}
+      >
+        <span className="min-w-0 text-[17px] font-semibold leading-6 tracking-[-0.01em] text-contact-ink min-[400px]:text-[19px] sm:text-[24px] sm:leading-8 lg:text-[26px]">
+          {site.email}
         </span>
-      </span>
-    </button>
+        <span
+          className="inline-flex shrink-0 items-center gap-1.5 text-[14px] font-semibold leading-5 text-contact-accent"
+          aria-live="polite"
+        >
+          {copied ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />}
+          <span className="sr-only sm:not-sr-only">{copied ? text.copied : text.copy}</span>
+        </span>
+      </button>
+      <a
+        href={`mailto:${site.email}`}
+        aria-label={text.openMail}
+        title={text.openMail}
+        className={cn(
+          "inline-flex size-14 shrink-0 items-center justify-center rounded-[14px] border border-contact-line text-contact-ink",
+          "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)] hover:border-contact-accent hover:text-contact-accent",
+          focusRing,
+        )}
+      >
+        <Mail className="size-5" aria-hidden="true" />
+      </a>
+    </div>
   );
 }
 
-const rowClass =
-  "group flex min-h-16 items-center gap-4 border-b border-contact-line py-1.5 transition-colors duration-[var(--duration-hover)]";
-const kindClass = "w-20 shrink-0 text-[15px] font-medium leading-5 text-contact-muted lg:w-24";
-const labelClass =
-  "min-w-0 flex-1 text-[17px] leading-[26px] text-contact-ink [overflow-wrap:break-word] md:text-[18px] md:leading-[27px]";
-
-function LinkRow({
-  kind,
-  href,
-  external,
-  arrow,
-  children,
-}: {
-  kind: string;
-  href: string;
-  external?: boolean;
-  arrow: string;
-  children: React.ReactNode;
-}) {
+function ProfileLink({ href, label, Arrow }: { href: string; label: string; Arrow: typeof ArrowUpRight }) {
   return (
     <a
       href={href}
-      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      className={cn(rowClass, "hover:border-contact-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-contact-accent")}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        "inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-full border border-contact-line px-5 text-[16px] font-semibold leading-5 text-contact-ink sm:flex-none",
+        "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)] hover:border-contact-accent hover:text-contact-accent",
+        focusRing,
+      )}
     >
-      <span className={kindClass}>{kind}</span>
-      {/* Latin text and numbers stay LTR inside RTL, aligned to the reading start */}
-      <span dir="ltr" className={cn(labelClass, "transition-colors group-hover:text-contact-accent rtl:text-right")}>
-        {children}
-      </span>
-      <span
-        aria-hidden="true"
-        className="shrink-0 text-[17px] leading-[26px] text-contact-muted transition-transform duration-[var(--duration-hover)] group-hover:-translate-y-0.5 ltr:group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 md:text-[18px] md:leading-[27px]"
-      >
-        {arrow}
-      </span>
+      <bdi dir="ltr">{label}</bdi>
+      <Arrow aria-hidden="true" className="size-4" strokeWidth={2} />
     </a>
+  );
+}
+
+/**
+ * Phones get the form in a bottom sheet: drag handle, swipe down / Esc / back to close, focus kept inside,
+ * lifted above the on-screen keyboard. It stays mounted (inert while shut) so a half-written message survives.
+ */
+function ContactSheet({
+  open,
+  onClose,
+  title,
+  closeLabel,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  closeLabel: string;
+  children: React.ReactNode;
+}) {
+  const lenis = useLenis();
+  const panel = useRef<HTMLDivElement>(null);
+  const drag = useRef<number | null>(null);
+  const [offset, setOffset] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [keyboard, setKeyboard] = useState(0);
+  const titleId = useId();
+
+  /** Closing from inside the sheet goes through history so the browser back button agrees with it. */
+  const requestClose = useCallback(() => {
+    if (window.history.state?.contactSheet) window.history.back();
+    else onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    if (!open) return;
+    window.history.pushState({ contactSheet: true }, "");
+    const onPop = () => onClose();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") requestClose();
+      if (event.key !== "Tab" || !panel.current) return;
+      const items = panel.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([tabindex="-1"]):not([disabled]), textarea:not([disabled])',
+      );
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    document.addEventListener("keydown", onKey);
+    lenis?.stop();
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const opener = document.activeElement as HTMLElement | null;
+    panel.current?.focus({ preventScroll: true });
+
+    const viewport = window.visualViewport;
+    const onViewport = () => {
+      if (!viewport) return;
+      setKeyboard(Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop));
+    };
+    viewport?.addEventListener("resize", onViewport);
+    viewport?.addEventListener("scroll", onViewport);
+
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      document.removeEventListener("keydown", onKey);
+      viewport?.removeEventListener("resize", onViewport);
+      viewport?.removeEventListener("scroll", onViewport);
+      document.body.style.overflow = previous;
+      lenis?.start();
+      setKeyboard(0);
+      opener?.focus({ preventScroll: true });
+    };
+  }, [open, onClose, requestClose, lenis]);
+
+  const onHandleDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    drag.current = event.clientY;
+    setDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const onHandleMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (drag.current === null) return;
+    setOffset(Math.max(0, event.clientY - drag.current));
+  };
+  const onHandleUp = () => {
+    if (drag.current === null) return;
+    drag.current = null;
+    if (offset > 96) requestClose();
+    setOffset(0);
+  };
+
+  return (
+    <div className="contact-sheet fixed inset-0 z-50 md:hidden" data-open={open} inert={!open}>
+      <div aria-hidden="true" onClick={requestClose} className="contact-sheet-scrim absolute inset-0 bg-ink/50" />
+      <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        style={{
+          bottom: keyboard,
+          transform: open ? `translateY(${offset}px)` : undefined,
+          transition: dragging ? "none" : undefined,
+        }}
+        className="contact-sheet-panel absolute inset-x-0 flex max-h-[90dvh] flex-col rounded-t-[24px] border border-b-0 border-line bg-surface text-ink outline-none"
+      >
+        <div
+          onPointerDown={onHandleDown}
+          onPointerMove={onHandleMove}
+          onPointerUp={onHandleUp}
+          onPointerCancel={onHandleUp}
+          className="flex h-8 shrink-0 cursor-grab touch-none items-center justify-center"
+        >
+          <span aria-hidden="true" className="h-1 w-10 rounded-full bg-line" />
+        </div>
+        <div className="flex items-center justify-between gap-3 px-5 pb-2">
+          <h3 id={titleId} className="text-[20px] font-semibold leading-7 tracking-[-0.02em] rtl:tracking-normal">
+            {title}
+          </h3>
+          <button
+            type="button"
+            onClick={requestClose}
+            aria-label={closeLabel}
+            className="inline-flex size-11 items-center justify-center rounded-full text-ink hover:bg-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          >
+            <X className="size-5" aria-hidden="true" />
+          </button>
+        </div>
+        <div className="overflow-y-auto overscroll-contain px-5 pb-[max(24px,env(safe-area-inset-bottom))] pt-2">
+          {children}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -136,55 +286,79 @@ export function ContactSection() {
   const text = copy[locale];
   const github = socialLinks.find((link) => link.name === "GitHub");
   const linkedin = socialLinks.find((link) => link.name === "LinkedIn");
+  const Arrow = locale === "ar" ? ArrowUpLeft : ArrowUpRight;
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const closeSheet = useCallback(() => setSheetOpen(false), []);
 
   return (
-    <section id="contact" aria-labelledby="contact-title" className="pt-20 md:pt-40">
-      <Container>
-        <div className="rounded-[28px] border border-contact-border bg-contact-bg px-6 py-10 sm:px-10 lg:px-14 lg:py-20">
-          <div className="flex flex-col gap-4">
-            <h2 id="contact-title" className="text-[15px] font-medium leading-5 text-contact-accent">
-              {text.eyebrow}
-            </h2>
-            <p className="max-w-[444px] text-[20px] leading-9 text-contact-muted lg:max-w-none">{text.lede}</p>
-            {/* The address is Latin, so this row stays left-to-right; in Arabic the button moves to the left edge as in Figma */}
-            <div dir="ltr" className="flex flex-col items-start gap-4 lg:flex-row lg:items-center lg:gap-8 rtl:lg:flex-row-reverse rtl:lg:justify-end">
-              <a
-                href={`mailto:${site.email}`}
-                className="min-w-0 text-[28px] font-semibold leading-[34px] tracking-[-0.02em] text-contact-ink transition-colors duration-[var(--duration-hover)] hover:text-contact-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-contact-accent sm:text-[44px] sm:leading-[48px] sm:tracking-[-0.03em] lg:text-[72px] lg:leading-[68px] lg:tracking-[-0.045em]"
-              >
-                {/* zero-width space lets the address wrap on very narrow screens */}
-                {site.email.replace("@", "@\u200b")}
-              </a>
-              <CopyButton value={site.email} label={text.copy} doneLabel={text.copied} />
+    <section
+      id="contact"
+      aria-labelledby="contact-title"
+      className="mt-20 bg-contact-bg text-contact-ink md:mt-40"
+    >
+      <Container className="py-16 md:py-24 lg:py-[120px]">
+        <div className="grid gap-12 lg:grid-cols-2 lg:items-start lg:gap-20">
+          <div className="flex min-w-0 flex-col gap-8">
+            <div className="flex flex-col gap-4">
+              <h2 id="contact-title" className="text-[15px] font-medium leading-5 text-contact-accent">
+                {text.eyebrow}
+              </h2>
+              <p className="text-[40px] font-semibold leading-[44px] tracking-[-0.03em] text-contact-ink rtl:leading-[56px] rtl:tracking-normal sm:text-[56px] sm:leading-[58px] rtl:sm:leading-[74px] lg:text-[64px] lg:leading-[66px] rtl:lg:leading-[84px]">
+                {text.headline}
+              </p>
+              <p className="max-w-[460px] text-[18px] leading-[27px] text-contact-muted">{text.availability}</p>
             </div>
+
+            <EmailCopy text={text} />
+
+            <div className="flex gap-3">
+              {linkedin ? <ProfileLink href={linkedin.url} label={linkedin.name} Arrow={Arrow} /> : null}
+              {github ? <ProfileLink href={github.url} label={github.name} Arrow={Arrow} /> : null}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setSheetOpen(true)}
+              aria-haspopup="dialog"
+              className={cn(
+                "inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-contact-btn text-[17px] font-semibold leading-5 text-contact-btn-fg md:hidden",
+                "transition-[filter,transform] duration-[var(--duration-hover)] ease-[var(--ease-standard)] hover:brightness-110 active:scale-[0.98]",
+                focusRing,
+              )}
+            >
+              <MessageSquare className="size-5" aria-hidden="true" />
+              {text.write}
+            </button>
+
+            <dl className="flex flex-col gap-3 border-t border-contact-line pt-6 text-[16px] leading-6">
+              <div className="flex flex-wrap items-baseline gap-x-4">
+                <dt className="w-24 shrink-0 text-contact-muted">{text.phone}</dt>
+                <dd>
+                  <a
+                    href={site.phoneHref}
+                    dir="ltr"
+                    className={cn("inline-flex min-h-11 items-center text-contact-ink transition-colors hover:text-contact-accent", focusRing)}
+                  >
+                    {site.phone}
+                  </a>
+                </dd>
+              </div>
+              <div className="flex flex-wrap items-baseline gap-x-4">
+                <dt className="w-24 shrink-0 text-contact-muted">{text.basedIn}</dt>
+                <dd className="text-contact-ink">{text.basedInValue}</dd>
+              </div>
+            </dl>
           </div>
 
-          <div className="mt-10 flex flex-col gap-10 pt-8 lg:grid lg:grid-cols-2 lg:gap-20">
-            <div className="flex flex-col lg:justify-between">
-              <LinkRow kind={text.phone} href={site.phoneHref} arrow={text.arrow}>
-                {site.phone}
-              </LinkRow>
-              {github ? (
-                <LinkRow kind={text.github} href={github.url} external arrow={text.arrow}>
-                  {breakable(github.label)}
-                </LinkRow>
-              ) : null}
-              {linkedin ? (
-                <LinkRow kind={text.linkedin} href={linkedin.url} external arrow={text.arrow}>
-                  <span className="sm:hidden">{linkedinShort}</span>
-                  <span className="hidden sm:inline">{breakable(linkedin.label)}</span>
-                </LinkRow>
-              ) : null}
-              <div className={rowClass}>
-                <span className={kindClass}>{text.basedIn}</span>
-                <span className={labelClass}>{text.basedInValue}</span>
-              </div>
-            </div>
-
+          <div className="hidden rounded-[24px] border border-line bg-surface p-6 text-ink md:block lg:p-8">
             <ContactForm />
           </div>
         </div>
       </Container>
+
+      <ContactSheet open={sheetOpen} onClose={closeSheet} title={text.sheetTitle} closeLabel={text.close}>
+        <ContactForm />
+      </ContactSheet>
     </section>
   );
 }

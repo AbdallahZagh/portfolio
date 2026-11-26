@@ -10,7 +10,6 @@ const copy: Record<Locale, { rights: string; links: { href: string; label: strin
       { href: "#experience", label: "Experience" },
       { href: "#projects", label: "Projects" },
       { href: "#skills", label: "Skills" },
-      { href: "#contact", label: "Get in touch" },
     ],
   },
   ar: {
@@ -19,7 +18,6 @@ const copy: Record<Locale, { rights: string; links: { href: string; label: strin
       { href: "#experience", label: "الخبرة" },
       { href: "#projects", label: "المشاريع" },
       { href: "#skills", label: "المهارات" },
-      { href: "#contact", label: "تواصل معي" },
     ],
   },
 };
@@ -29,15 +27,15 @@ export function Footer() {
   const text = copy[locale];
 
   return (
-    <footer>
+    <footer className="border-t border-contact-line bg-contact-bg">
       <Container className="flex flex-col gap-2 pb-6 pt-6 md:h-[92px] md:flex-row md:items-center md:justify-between md:py-0">
-        <p className="text-[15px] font-medium leading-5 text-muted">{text.rights}</p>
+        <p className="text-[15px] font-medium leading-5 text-contact-muted">{text.rights}</p>
         <nav aria-label={locale === "ar" ? "التذييل" : "Footer"} className="flex flex-wrap gap-x-6">
           {text.links.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="inline-flex h-11 items-center px-2 text-[15px] font-medium leading-5 text-muted transition-colors duration-[var(--duration-hover)] hover:text-ink focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-text"
+              className="inline-flex h-11 items-center px-2 text-[15px] font-medium leading-5 text-contact-muted transition-colors duration-[var(--duration-hover)] hover:text-contact-ink focus-visible:text-contact-ink focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-contact-accent"
             >
               {link.label}
             </a>

@@ -60,9 +60,9 @@ const WidgetBody = memo(function WidgetBody({
   return <Widget copy={copy} size={size} dragging={dragging} />;
 }, (a, b) => a.id === b.id && a.copy === b.copy && a.dragging === b.dragging && a.size.w === b.size.w && a.size.h === b.size.h);
 
-// Widgets keep a soft translucent fill with a hairline. No blur and no white glow on the cards.
+// Widgets are translucent glass cards (see .glass-card). Only the panel around them blurs.
 const cardClass =
-  "group/card relative flex select-none flex-col overflow-hidden rounded-[12px] border border-line bg-surface/60 p-3 outline-none " +
+  "glass-card group/card relative flex select-none flex-col overflow-hidden rounded-[12px] border p-3 outline-none " +
   "hover:border-ink focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 
 function GripHandle({
