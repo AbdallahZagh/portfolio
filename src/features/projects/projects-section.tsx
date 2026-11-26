@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { ArrowUpRight, Lock } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
@@ -24,7 +24,6 @@ const copy: Record<
     whatItDoes: string;
     whatIBuilt: string;
     stack: string;
-    privateRepo: string;
   }
 > = {
   en: {
@@ -37,7 +36,6 @@ const copy: Record<
     whatItDoes: "What it does",
     whatIBuilt: "What I built",
     stack: "Stack",
-    privateRepo: "Private repo",
   },
   ar: {
     title: "المشاريع",
@@ -49,7 +47,6 @@ const copy: Record<
     whatItDoes: "ما يفعله",
     whatIBuilt: "ما بنيتُه",
     stack: "التقنيات",
-    privateRepo: "مستودع خاص",
   },
 };
 
@@ -63,7 +60,7 @@ function FeaturedProject({ text }: { text: (typeof copy)[Locale] }) {
 
   return (
     <article className="grid items-center gap-6 border-b border-line py-8 lg:grid-cols-[648px_minmax(0,1fr)] lg:gap-6 lg:py-14">
-      <Reveal variant="clip" className="min-w-0">
+      <Reveal variant="soft" className="min-w-0 overflow-visible">
         <NovaGallery
           main={project.image}
           left={project.sideImages.left}
@@ -142,7 +139,7 @@ function Row({
   open: boolean;
   onToggle: () => void;
   githubLabel: string;
-  labels: { whatItDoes: string; whatIBuilt: string; stack: string; privateRepo: string };
+  labels: { whatItDoes: string; whatIBuilt: string; stack: string };
   delay?: number;
 }) {
   const { locale } = useLocale();
@@ -219,12 +216,7 @@ function Row({
                 {githubLabel}
                 <ExternalArrow />
               </Button>
-            ) : (
-              <p className="inline-flex items-center gap-2 text-[15px] font-medium leading-5 text-muted">
-                <Lock aria-hidden className="size-4" strokeWidth={2} />
-                {labels.privateRepo}
-              </p>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

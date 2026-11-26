@@ -49,7 +49,7 @@ export function SectionHead({
         {title}
       </h2>
       {aside ? (
-        <p className="text-[17px] leading-[26px] text-muted md:max-w-[440px] md:text-end md:text-[18px] md:leading-[27px]">
+        <p className="text-start text-[17px] leading-[26px] text-muted md:max-w-[540px] md:text-[18px] md:leading-[27px]">
           {aside}
         </p>
       ) : null}

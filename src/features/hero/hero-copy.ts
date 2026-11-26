@@ -181,10 +181,10 @@ const heroCopySource: Record<Locale, HeroCopy> = {
   },
   ar: {
     role: "مهندس واجهات أمامية وقائد تقني (React / Next.js) · دمشق، سوريا",
-    headline: { lines: ["واجهات", "للبيانات", "الحيّة."], accent: 1 },
+    headline: { lines: ["واجهات", "للبيانات", "اللحظية."], accent: 1 },
     leadStrong: "أكثر من 4 سنوات في بناء تطبيقات ويب إنتاجية",
-    leadRest: " بـ React وNext.js وTypeScript. متاح لفرص العمل عن بُعد حول العالم.",
-    leadRestMobile: " بـ React وNext.js وTypeScript. متاح لفرص العمل عن بُعد حول العالم.",
+    leadRest: " باستخدام React وNext.js وTypeScript. متاح لفرص العمل عن بُعد حول العالم.",
+    leadRestMobile: " باستخدام React وNext.js وTypeScript. متاح لفرص العمل عن بُعد حول العالم.",
     talk: "تواصل معي",
     downloadCv: "تحميل السيرة الذاتية · PDF",
     builder: {
@@ -209,7 +209,7 @@ const heroCopySource: Record<Locale, HeroCopy> = {
       typing: "يكتب",
       sending: "جارٍ الإرسال",
       stable: "مستقر",
-      patching: "جارٍ الإصلاح",
+      patching: "جارٍ التصحيح",
       physicsOn: "الفيزياء مفعّلة",
       sloshing: "يتموّج",
       paused: "متوقف",
@@ -217,12 +217,12 @@ const heroCopySource: Record<Locale, HeroCopy> = {
     },
     widgets: {
       scope: {
-        title: "راسم الرسائل",
+        title: "راسم إشارة الرسالة",
         sample: "«مرحبًا عبدالله، هل أنت متاح لمكالمة هذا الأسبوع؟»",
         warming: "جارٍ تهيئة الراسم…",
         empty: "ابدأ الكتابة في نموذج التواصل لترى إشارتك",
         transmitting: (n) =>
-          `إرسال · ${arCount(n, { zero: `${n} أحرف`, one: "حرف واحد", two: "حرفان", few: `${n} أحرف`, many: `${n} حرفًا`, other: `${n} حرف` })}`,
+          `جارٍ البثّ · ${arCount(n, { zero: `${n} أحرف`, one: "حرف واحد", two: "حرفان", few: `${n} أحرف`, many: `${n} حرفًا`, other: `${n} حرف` })}`,
       },
       telemetry: {
         title: "بيانات الزائر",
@@ -241,8 +241,8 @@ const heroCopySource: Record<Locale, HeroCopy> = {
         stable: (n) => `${arBugs(n)} · مستقر`,
         pulse: (n) => `${arBugs(n)} · نبضة ×${n}`,
         throw: "أطلق خطأً",
-        patching: "جارٍ الإصلاح…",
-        starting: "تشغيل النواة…",
+        patching: "جارٍ التصحيح…",
+        starting: "جارٍ تشغيل النواة…",
         tap: "اضغط على النواة",
         reducedMotion: "تقليل الحركة مفعّل",
       },

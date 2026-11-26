@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local QA output and review briefs
+/.scratch/
+/grok-review-prompt.md
+/portfolio-v3-*.md

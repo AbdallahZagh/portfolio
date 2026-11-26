@@ -63,13 +63,16 @@ export function ExperienceSection() {
             <Reveal
               as="li"
               key={job.id}
-              className="grid gap-4 border-b border-line py-8 lg:grid-cols-[minmax(0,312fr)_minmax(0,424fr)_minmax(0,536fr)] lg:gap-6"
+              className="border-b border-line py-8"
             >
-              <p className="reveal-start text-[16px] font-medium leading-5 text-muted rtl:leading-6">
+              <div className="lg:grid lg:grid-cols-[minmax(0,312fr)_minmax(0,424fr)_minmax(0,536fr)] lg:items-start lg:gap-6">
+              {/* Date and title stay pinned while this role's bullets scroll past. One block on phones; two columns from lg. */}
+              <div className="sticky top-[84px] z-10 flex flex-col gap-4 bg-bg lg:contents">
+              <p className="reveal-start text-[16px] font-medium leading-5 text-muted lg:sticky lg:top-[96px] lg:z-10 lg:self-start lg:bg-bg rtl:leading-6">
                 {job.period[locale]}
               </p>
 
-              <div className="flex min-w-0 flex-col gap-2">
+              <div className="flex min-w-0 flex-col gap-2 lg:sticky lg:top-[96px] lg:z-10 lg:self-start lg:bg-bg">
                 <h3 className="text-[22px] font-semibold leading-7 tracking-[-0.02em] text-ink rtl:leading-[34px] rtl:tracking-normal lg:text-[28px] lg:leading-[34px] rtl:lg:leading-[42px]">
                   {job.title[locale]}
                 </h3>
@@ -86,8 +89,9 @@ export function ExperienceSection() {
                   ))}
                 </ul>
               </div>
+              </div>
 
-              <div className="flex min-w-0 flex-col items-start gap-4">
+              <div className="mt-4 flex min-w-0 flex-col items-start gap-4 lg:mt-0">
                 <ExperienceBullets
                   bullets={job.bullets[locale]}
                   showAll={text.showAll}
@@ -104,6 +108,7 @@ export function ExperienceSection() {
                     closeLabel={text.close}
                   />
                 ) : null}
+              </div>
               </div>
             </Reveal>
           ))}

@@ -4,6 +4,7 @@ import { HeroSection } from "@/features/hero/hero-section";
 import { ExperienceSection } from "@/features/experience/experience-section";
 import { ProjectsSection } from "@/features/projects/projects-section";
 import { SkillsSection } from "@/features/skills/skills-section";
+import { BackgroundSection } from "@/features/background/background-section";
 import { ContactSection } from "@/features/contact/contact-section";
 
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
         <ExperienceSection />
         <ProjectsSection />
         <SkillsSection />
+        <BackgroundSection />
         <ContactSection />
       </main>
       <Footer />

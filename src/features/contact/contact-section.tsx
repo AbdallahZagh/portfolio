@@ -37,7 +37,7 @@ const copy: Record<Locale, ContactCopy> = {
     locationValue: "Damascus · UTC+3",
   },
   ar: {
-    title: "تواصل",
+    title: "التواصل",
     chip: "متاح لفرص العمل عن بُعد حول العالم",
     headline: "لنبنِ شيئًا معًا.",
     copy: "نسخ",
