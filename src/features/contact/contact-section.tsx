@@ -95,7 +95,7 @@ function EmailCopy({ text }: { text: ContactCopy }) {
           focusRing,
         )}
       >
-        <span className="min-w-0 text-[17px] font-semibold leading-6 tracking-[-0.01em] text-contact-ink min-[400px]:text-[19px] sm:text-[24px] sm:leading-8 lg:text-[26px]">
+        <span className="min-w-0 text-[15px] font-semibold leading-6 tracking-[-0.01em] text-contact-ink min-[360px]:text-[17px] min-[400px]:text-[19px] sm:text-[24px] sm:leading-8 lg:text-[26px]">
           {site.email}
         </span>
         <span

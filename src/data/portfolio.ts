@@ -576,8 +576,10 @@ export const skillChipGroups: SkillChipGroup[] = [
 const LATIN_WORD = String.raw`\.?[A-Za-z](?:[A-Za-z0-9+#./_-]*[A-Za-z0-9+#])?`;
 const LATIN_NUMBER = String.raw`[0-9]+(?:[./][0-9]+)*\+?`;
 const LATIN_PAREN = String.raw`\(${LATIN_WORD}(?: +(?:${LATIN_WORD}|${LATIN_NUMBER}))*\)`;
+/** A lone "/" or "&" between two Latin words ("React / Next.js") belongs to the run. */
+const LATIN_JOINER = String.raw`[/&]`;
 const LATIN_RUN = new RegExp(
-  String.raw`(?:${LATIN_WORD}|${LATIN_PAREN})(?: +(?:${LATIN_WORD}|${LATIN_NUMBER}|${LATIN_PAREN}))*`,
+  String.raw`(?:${LATIN_WORD}|${LATIN_PAREN})(?: +(?:${LATIN_WORD}|${LATIN_NUMBER}|${LATIN_PAREN}|${LATIN_JOINER}(?= +[A-Za-z(])))*`,
   "g",
 );
 
@@ -588,7 +590,8 @@ const LATIN_RUN = new RegExp(
  */
 export function isolateLatin(text: string): string {
   if (text.includes("\u2066")) return text;
-  return text.replace(LATIN_RUN, (run) => `\u2066${run}\u2069`);
+  // Short runs also get non-breaking spaces so a line break cannot split "React / Next.js" across two lines.
+  return text.replace(LATIN_RUN, (run) => `\u2066${run.length <= 26 ? run.replace(/ /g, "\u00a0") : run}\u2069`);
 }
 
 /** Walks the content tree once and isolates the Arabic side of every { en, ar } pair, in place. */
@@ -608,3 +611,12 @@ function isolateArabicContent(node: unknown): void {
 }
 
 isolateArabicContent([experiences, featuredProject, projectRows, skillChipGroups, education, languages]);
+/** Isolates every string in an all-Arabic structure (strings, arrays, nested objects); functions are left alone. */
+export function isolateAllStrings<T>(node: T): T {
+  if (typeof node === "string") return isolateLatin(node) as T;
+  if (Array.isArray(node)) return node.map(isolateAllStrings) as T;
+  if (node && typeof node === "object") {
+    return Object.fromEntries(Object.entries(node).map(([key, value]) => [key, isolateAllStrings(value)])) as T;
+  }
+  return node;
+}

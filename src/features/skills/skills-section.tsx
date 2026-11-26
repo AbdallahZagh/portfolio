@@ -66,7 +66,7 @@ function Group({ group, text }: { group: SkillChipGroup; text: SkillsCopy }) {
                 onClick={() => setOpen((value) => !value)}
                 className={cn(
                   chipClass,
-                  "border-transparent bg-tint text-brand-text transition-colors duration-[var(--duration-hover)] hover:border-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+                  "relative border-transparent bg-tint text-brand-text after:absolute after:-inset-y-1 after:inset-x-0 after:content-[''] transition-colors duration-[var(--duration-hover)] hover:border-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
                 )}
               >
                 {open ? text.less : text.more(rest)}

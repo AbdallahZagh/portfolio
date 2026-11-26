@@ -1,5 +1,6 @@
 import type { Locale } from "@/components/locale-provider";
 import { arBugs, arCount } from "@/lib/ar-plural";
+import { isolateAllStrings } from "@/data/portfolio";
 
 /**
  * Hero + builder copy.
@@ -91,7 +92,7 @@ export type HeroCopy = {
   };
 };
 
-export const heroCopy: Record<Locale, HeroCopy> = {
+const heroCopySource: Record<Locale, HeroCopy> = {
   en: {
     role: "Frontend Engineer & Technical Lead (React / Next.js) · Damascus, Syria",
     headline: { lines: ["Interfaces", "for live", "data."], accent: 1, accentWord: "live" },
@@ -265,4 +266,10 @@ export const heroCopy: Record<Locale, HeroCopy> = {
       },
     },
   },
+};
+
+/** Latin names inside the Arabic lines (React, Next.js) are isolated so punctuation cannot jump across. */
+export const heroCopy: Record<Locale, HeroCopy> = {
+  en: heroCopySource.en,
+  ar: isolateAllStrings(heroCopySource.ar),
 };
