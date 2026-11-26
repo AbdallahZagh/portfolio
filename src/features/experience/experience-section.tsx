@@ -1,5 +1,8 @@
 "use client";
 
+import { motion, useReducedMotion, useScroll } from "framer-motion";
+import { useRef } from "react";
+import { Reveal } from "@/components/ui/reveal";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { SectionHead } from "@/components/ui/section-heading";
@@ -37,19 +40,31 @@ const copy: Record<
 export function ExperienceSection() {
   const { locale } = useLocale();
   const text = copy[locale];
+  const reduce = useReducedMotion();
+  const listRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: progress } = useScroll({ target: listRef, offset: ["start 70%", "end 55%"] });
 
   return (
     <section id="experience" aria-labelledby="experience-title" className="pt-20 md:pt-40">
       <Container>
         <SectionHead id="experience-title" title={text.title} aside={text.aside} />
 
+        <div ref={listRef} className="relative">
+          {/* Scroll-linked timeline: a hairline at the start edge that fills as the list scrolls past. */}
+          <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 -start-3 hidden w-px bg-line min-[1100px]:block">
+            <motion.span
+              className="absolute inset-x-0 top-0 h-full origin-top bg-brand"
+              style={{ scaleY: reduce ? 1 : progress }}
+            />
+          </span>
         <ol>
           {experiences.map((job) => (
-            <li
+            <Reveal
+              as="li"
               key={job.id}
               className="grid gap-4 border-b border-line py-8 lg:grid-cols-[minmax(0,312fr)_minmax(0,424fr)_minmax(0,536fr)] lg:gap-6"
             >
-              <p className="text-[16px] font-medium leading-5 text-muted rtl:leading-6">
+              <p className="reveal-start text-[16px] font-medium leading-5 text-muted rtl:leading-6">
                 {job.period[locale]}
               </p>
 
@@ -83,9 +98,10 @@ export function ExperienceSection() {
                   />
                 ) : null}
               </div>
-            </li>
+            </Reveal>
           ))}
         </ol>
+        </div>
       </Container>
     </section>
   );

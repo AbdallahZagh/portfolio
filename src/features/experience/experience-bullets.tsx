@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useState, type CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
 /** Bullets shown before the "Show all" toggle on phones. Wider screens always show every bullet. */
@@ -18,14 +18,14 @@ export function ExperienceBullets({ bullets, showAll, showLess }: Props) {
   const head = bullets.slice(0, PREVIEW_COUNT);
   const rest = bullets.slice(PREVIEW_COUNT);
 
-  const itemClass = "text-[17px] leading-[26px] text-muted";
+  const itemClass = "reveal-item text-[17px] leading-[26px] text-muted";
   const listClass = "flex list-disc flex-col gap-2 ps-[18px] marker:text-line";
 
   return (
     <div className="flex w-full min-w-0 flex-col items-start">
       <ul className={cn(listClass, "w-full")}>
-        {head.map((bullet) => (
-          <li key={bullet} className={itemClass}>
+        {head.map((bullet, index) => (
+          <li key={bullet} className={itemClass} style={{ "--i": index } as CSSProperties}>
             {bullet}
           </li>
         ))}
@@ -42,8 +42,8 @@ export function ExperienceBullets({ bullets, showAll, showLess }: Props) {
             )}
           >
             <ul className={cn(listClass, "min-h-0 overflow-hidden pt-2")}>
-              {rest.map((bullet) => (
-                <li key={bullet} className={itemClass}>
+              {rest.map((bullet, index) => (
+                <li key={bullet} className={itemClass} style={{ "--i": index + PREVIEW_COUNT } as CSSProperties}>
                   {bullet}
                 </li>
               ))}

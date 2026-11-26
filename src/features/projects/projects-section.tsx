@@ -5,6 +5,7 @@ import { ArrowUpRight, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { Reveal } from "@/components/ui/reveal";
 import { SectionHead } from "@/components/ui/section-heading";
 import { useLocale, type Locale } from "@/components/locale-provider";
 import { featuredProject, projectRows, type ProjectRow } from "@/data/portfolio";
@@ -62,12 +63,14 @@ function FeaturedProject({ text }: { text: (typeof copy)[Locale] }) {
 
   return (
     <article className="grid items-center gap-6 border-b border-line py-8 lg:grid-cols-[648px_minmax(0,1fr)] lg:gap-6 lg:py-14">
-      <NovaGallery
-        main={project.image}
-        left={project.sideImages.left}
-        right={project.sideImages.right}
-        label={text.gallery}
-      />
+      <Reveal variant="clip" className="min-w-0">
+        <NovaGallery
+          main={project.image}
+          left={project.sideImages.left}
+          right={project.sideImages.right}
+          label={text.gallery}
+        />
+      </Reveal>
 
       <div className="flex min-w-0 flex-col items-start gap-4">
         <p className="text-[16px] font-medium leading-5 text-muted rtl:leading-6">{project.kicker[locale]}</p>
@@ -133,18 +136,20 @@ function Row({
   onToggle,
   githubLabel,
   labels,
+  delay = 0,
 }: {
   row: ProjectRow;
   open: boolean;
   onToggle: () => void;
   githubLabel: string;
   labels: { whatItDoes: string; whatIBuilt: string; stack: string; privateRepo: string };
+  delay?: number;
 }) {
   const { locale } = useLocale();
   const panelId = useId();
 
   return (
-    <li className="border-b border-line">
+    <Reveal as="li" delay={delay} className="border-b border-line">
       <button
         type="button"
         data-project-row={row.id}
@@ -155,7 +160,7 @@ function Row({
           "group relative flex min-h-14 w-full cursor-pointer flex-col gap-2 rounded-lg px-4 py-5 pe-12 text-start",
           "transition-[padding,background-color] duration-[var(--duration-row-indent)] ease-[var(--ease-standard)]",
           "active:bg-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-          "lg:flex-row lg:items-center lg:gap-0 lg:py-8 lg:hover:ps-10 lg:aria-expanded:ps-10 motion-reduce:lg:hover:ps-4 motion-reduce:lg:aria-expanded:ps-4",
+          "lg:flex-row lg:items-center lg:gap-0 lg:py-8 lg:hover:ps-6 lg:aria-expanded:ps-6 motion-reduce:lg:hover:ps-4 motion-reduce:lg:aria-expanded:ps-4",
         )}
       >
         <span className="hidden w-20 shrink-0 text-[18px] leading-[27px] text-muted lg:block">{row.index}</span>
@@ -223,7 +228,7 @@ function Row({
           </div>
         </div>
       </div>
-    </li>
+    </Reveal>
   );
 }
 
@@ -293,9 +298,10 @@ export function ProjectsSection() {
         <SectionHead id="projects-title" title={text.title} aside={text.aside} />
         <FeaturedProject text={text} />
         <ul>
-          {projectRows.map((row) => (
+          {projectRows.map((row, index) => (
             <Row
               key={row.id}
+              delay={index * 60}
               row={row}
               open={openId === row.id}
               onToggle={() => setOpenId((current) => (current === row.id ? null : row.id))}

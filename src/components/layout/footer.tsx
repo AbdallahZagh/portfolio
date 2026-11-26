@@ -1,6 +1,7 @@
 "use client";
 
 import { Container } from "@/components/ui/container";
+import { Reveal } from "@/components/ui/reveal";
 import { useLocale, type Locale } from "@/components/locale-provider";
 
 const copy: Record<Locale, { rights: string; links: { href: string; label: string }[] }> = {
@@ -28,6 +29,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-contact-line bg-contact-bg">
+      <Reveal variant="soft">
       <Container className="flex flex-col gap-2 pb-6 pt-6 md:h-[92px] md:flex-row md:items-center md:justify-between md:py-0">
         <p className="text-[15px] font-medium leading-5 text-contact-muted">{text.rights}</p>
         <nav aria-label={locale === "ar" ? "التذييل" : "Footer"} className="flex flex-wrap gap-x-6">
@@ -42,6 +44,7 @@ export function Footer() {
           ))}
         </nav>
       </Container>
+      </Reveal>
     </footer>
   );
 }

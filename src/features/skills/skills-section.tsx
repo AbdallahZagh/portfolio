@@ -1,7 +1,8 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useState, type CSSProperties } from "react";
 import { Container } from "@/components/ui/container";
+import { Reveal } from "@/components/ui/reveal";
 import { SectionHead } from "@/components/ui/section-heading";
 import { useLocale, type Locale } from "@/components/locale-provider";
 import { education, languages, skillChipGroups, type SkillChipGroup } from "@/data/portfolio";
@@ -40,7 +41,8 @@ function Group({ group, text }: { group: SkillChipGroup; text: SkillsCopy }) {
   const rest = folded ? items.length - VISIBLE : 0;
 
   return (
-    <div className="grid gap-3 border-b border-line py-6 lg:grid-cols-[312px_minmax(0,1fr)] lg:gap-6 lg:py-7">
+    <Reveal variant="plain" className="relative grid gap-3 py-6 lg:grid-cols-[312px_minmax(0,1fr)] lg:gap-6 lg:py-7">
+      <span aria-hidden="true" className="reveal-line absolute inset-x-0 bottom-0 h-px bg-line" />
       <dt className="text-[16px] font-medium leading-6 text-muted lg:leading-9">{group.label[locale]}</dt>
       <dd>
         <ul id={regionId} className="flex flex-wrap gap-2">
@@ -49,6 +51,8 @@ function Group({ group, text }: { group: SkillChipGroup; text: SkillsCopy }) {
               key={item}
               // Folded chips stay in the page for search and screen readers once opened; until then they are hidden.
               hidden={folded && !open && index >= VISIBLE}
+              className="reveal-item"
+              style={{ "--i": index, "--step": "20ms" } as CSSProperties}
             >
               <bdi className={cn(chipClass)}>{item}</bdi>
             </li>
@@ -71,7 +75,7 @@ function Group({ group, text }: { group: SkillChipGroup; text: SkillsCopy }) {
           ) : null}
         </ul>
       </dd>
-    </div>
+    </Reveal>
   );
 }
 

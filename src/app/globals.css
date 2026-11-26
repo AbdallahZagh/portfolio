@@ -591,3 +591,72 @@ html.theme-switching body {
   border-color: var(--line);
 }
 .liquid-glass-pill { transition: background-color 220ms var(--ease-standard), border-color 220ms var(--ease-standard); }
+
+/* ---- Scroll reveals (see components/ui/reveal.tsx). Content is in the HTML; JS only parks what is below the fold. ---- */
+.reveal {
+  transition:
+    opacity 600ms var(--ease-out-expo) var(--reveal-delay, 0ms),
+    translate 600ms var(--ease-out-expo) var(--reveal-delay, 0ms),
+    scale 700ms var(--ease-out-expo) var(--reveal-delay, 0ms),
+    clip-path 900ms var(--ease-out-expo) var(--reveal-delay, 0ms);
+}
+.reveal[data-state="pending"] { opacity: 0; }
+.reveal[data-reveal="rise"][data-state="pending"] { translate: 0 14px; }
+.reveal[data-reveal="start"][data-state="pending"] { translate: -14px 0; }
+[dir="rtl"] .reveal[data-reveal="start"][data-state="pending"] { translate: 14px 0; }
+.reveal[data-reveal="scale"] { transform-origin: 50% 0; }
+.reveal[data-reveal="scale"][data-state="pending"] { scale: 0.96; }
+/* The wipe is on the child so the observed box keeps its size. */
+.reveal[data-reveal="clip"] > * {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 900ms var(--ease-out-expo) var(--reveal-delay, 0ms);
+}
+.reveal[data-reveal="clip"][data-state="pending"] { opacity: 1; }
+.reveal[data-reveal="clip"][data-state="pending"] > * { clip-path: inset(0 0 100% 0); }
+
+/* Children that follow their parent block, one after another (--i = position, --step = gap). */
+.reveal-item {
+  transition:
+    opacity 500ms var(--ease-out-expo) calc(var(--reveal-delay, 0ms) + 120ms + var(--i, 0) * var(--step, 30ms)),
+    translate 500ms var(--ease-out-expo) calc(var(--reveal-delay, 0ms) + 120ms + var(--i, 0) * var(--step, 30ms));
+}
+[data-state="pending"] .reveal-item { opacity: 0; translate: 0 8px; }
+
+/* A hairline that draws itself from the start edge. */
+.reveal-line {
+  transform-origin: left center;
+  transition: scale 700ms var(--ease-out-expo) var(--reveal-delay, 0ms);
+}
+[dir="rtl"] .reveal-line { transform-origin: right center; }
+[data-state="pending"] .reveal-line { scale: 0 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-item {
+    transition: opacity 200ms linear var(--reveal-delay, 0ms);
+  }
+  .reveal-line { transition: none; }
+  .reveal[data-state="pending"],
+  .reveal[data-reveal][data-state="pending"] { translate: none; scale: none; opacity: 0; }
+  .reveal[data-reveal="clip"][data-state="pending"] { opacity: 0; }
+  .reveal[data-reveal="clip"][data-state="pending"] > *,
+  .reveal[data-reveal="clip"] > * { clip-path: none; transition: none; }
+  [data-state="pending"] .reveal-item { translate: none; }
+  [data-state="pending"] .reveal-line { scale: none; }
+}
+
+.reveal-start {
+  transition:
+    opacity 600ms var(--ease-out-expo) calc(var(--reveal-delay, 0ms) + 60ms),
+    translate 600ms var(--ease-out-expo) calc(var(--reveal-delay, 0ms) + 60ms);
+}
+[data-state="pending"] .reveal-start { opacity: 0; translate: -14px 0; }
+[dir="rtl"] [data-state="pending"] .reveal-start { translate: 14px 0; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal-start { transition: opacity 200ms linear; }
+  [data-state="pending"] .reveal-start { translate: none; }
+}
+
+.reveal[data-reveal="plain"][data-state="pending"] { opacity: 1; }
+
+.reveal[data-reveal="soft"][data-state="pending"] { translate: 0 8px; }

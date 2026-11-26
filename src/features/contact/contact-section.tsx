@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { ArrowUpLeft, ArrowUpRight, Check, Copy, Mail, MessageSquare, X } from "lucide-react";
 import { useLenis } from "lenis/react";
 import { ContactForm } from "./contact-form";
 import { Container } from "@/components/ui/container";
+import { Reveal } from "@/components/ui/reveal";
 import { useLocale, type Locale } from "@/components/locale-provider";
 import { ltr, site, socialLinks } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
@@ -291,7 +292,10 @@ export function ContactSection() {
   const closeSheet = useCallback(() => setSheetOpen(false), []);
 
   return (
-    <section
+    <>
+    <Reveal
+      as="section"
+      variant="scale"
       id="contact"
       aria-labelledby="contact-title"
       className="mt-20 bg-contact-bg text-contact-ink md:mt-40"
@@ -304,9 +308,18 @@ export function ContactSection() {
                 {text.eyebrow}
               </h2>
               <p className="text-[40px] font-semibold leading-[44px] tracking-[-0.03em] text-contact-ink rtl:leading-[56px] rtl:tracking-normal sm:text-[56px] sm:leading-[58px] rtl:sm:leading-[74px] lg:text-[64px] lg:leading-[66px] rtl:lg:leading-[84px]">
-                {text.headline}
+                {text.headline.split(" ").map((word, index) => (
+                  <span
+                    key={`${word}-${index}`}
+                    className="reveal-item me-[0.26em] inline-block"
+                    style={{ "--i": index, "--step": "60ms" } as CSSProperties}
+                  >
+                    {word}
+                  </span>
+                ))}
               </p>
               <p className="max-w-[460px] text-[18px] leading-[27px] text-contact-muted">{text.availability}</p>
+              <span aria-hidden="true" className="reveal-line h-0.5 w-16 bg-contact-accent" />
             </div>
 
             <EmailCopy text={text} />
@@ -330,7 +343,8 @@ export function ContactSection() {
               {text.write}
             </button>
 
-            <dl className="flex flex-col gap-3 border-t border-contact-line pt-6 text-[16px] leading-6">
+            <dl className="relative flex flex-col gap-3 pt-6 text-[16px] leading-6">
+              <span aria-hidden="true" className="reveal-line absolute inset-x-0 top-0 h-px bg-contact-line" />
               <div className="flex flex-wrap items-baseline gap-x-4">
                 <dt className="w-24 shrink-0 text-contact-muted">{text.phone}</dt>
                 <dd>
@@ -355,10 +369,12 @@ export function ContactSection() {
           </div>
         </div>
       </Container>
+    </Reveal>
 
-      <ContactSheet open={sheetOpen} onClose={closeSheet} title={text.sheetTitle} closeLabel={text.close}>
-        <ContactForm />
-      </ContactSheet>
-    </section>
+    {/* Outside the section: a scaling ancestor would otherwise become the fixed sheet's containing block. */}
+    <ContactSheet open={sheetOpen} onClose={closeSheet} title={text.sheetTitle} closeLabel={text.close}>
+      <ContactForm />
+    </ContactSheet>
+    </>
   );
 }
