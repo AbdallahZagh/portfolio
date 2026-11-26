@@ -115,36 +115,9 @@ function useActiveSection() {
   return [active, hold] as const;
 }
 
-/** True while the olive contact block sits under the pill, where frosted glass would turn muddy. */
-function useOverOlive() {
-  const [solid, setSolid] = useState(false);
-  useEffect(() => {
-    const el = document.getElementById("contact");
-    if (!el) return;
-    let frame = 0;
-    const check = () => {
-      frame = 0;
-      setSolid(el.getBoundingClientRect().top <= 64);
-    };
-    const onScroll = () => {
-      if (!frame) frame = window.requestAnimationFrame(check);
-    };
-    check();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (frame) window.cancelAnimationFrame(frame);
-    };
-  }, []);
-  return solid;
-}
-
 export function Navbar() {
   const { locale, setLocale } = useLocale();
   const [active, hold] = useActiveSection();
-  const solid = useOverOlive();
   const lenis = useLenis();
   const reduce = useReducedMotion();
   const text = copy[locale];
@@ -249,7 +222,6 @@ export function Navbar() {
       <header className="pointer-events-none fixed inset-x-0 top-0 z-40 bg-transparent px-4 pt-3 lg:px-8 lg:pt-4">
         <nav
           aria-label={text.primary}
-          data-solid={solid}
           className="nav-drop liquid-glass-pill pointer-events-auto relative mx-auto flex h-16 w-full max-w-[1328px] items-center justify-between rounded-full px-3 lg:h-[70px] lg:px-4"
         >
           <Monogram name={text.name} withName onClick={(event) => follow(event, "#home")} />
