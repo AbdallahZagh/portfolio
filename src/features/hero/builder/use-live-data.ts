@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useReducedMotion } from "framer-motion";
 import { useMounted } from "@/lib/use-mounted";
+import { useLocale } from "@/components/locale-provider";
 
 export { useMounted };
 
@@ -197,9 +198,17 @@ type LayoutShiftEntry = PerformanceEntry & { value: number; hadRecentInput: bool
 type EventTimingEntry = PerformanceEntry & { interactionId?: number; duration: number };
 
 export function useWebVitals(): Vitals {
+  const { locale } = useLocale();
   const [vitals, setVitals] = useState<Vitals>({ status: "loading" });
+  // Switching language re-renders the whole page, so CLS and INP start counting again from that moment.
+  const since = useRef(0);
+  const firstRun = useRef(true);
 
   useEffect(() => {
+    if (firstRun.current) firstRun.current = false;
+    else since.current = performance.now();
+    const from = since.current;
+
     if (typeof PerformanceObserver === "undefined") {
       const frame = requestAnimationFrame(() => setVitals({ status: "nodata" }));
       return () => cancelAnimationFrame(frame);
@@ -240,28 +249,30 @@ export function useWebVitals(): Vitals {
     });
     observe("layout-shift", (entries) => {
       for (const entry of entries as LayoutShiftEntry[]) {
-        if (!entry.hadRecentInput) cls += entry.value;
+        if (entry.startTime >= from && !entry.hadRecentInput) cls += entry.value;
       }
     });
     observe(
       "event",
       (entries) => {
         for (const entry of entries as EventTimingEntry[]) {
+          if (entry.startTime < from) continue;
           if (entry.interactionId && (inp === undefined || entry.duration > inp)) inp = entry.duration;
         }
       },
       { durationThreshold: 16 },
     );
 
+    // Never leave the card on "Measuring…": after 1.5 s it shows what it has.
     const timeout = window.setTimeout(() => {
       if (lcp === undefined) setVitals({ status: "nodata" });
-    }, 4000);
+    }, 1500);
 
     return () => {
       window.clearTimeout(timeout);
       observers.forEach((observer) => observer.disconnect());
     };
-  }, []);
+  }, [locale]);
 
   return vitals;
 }

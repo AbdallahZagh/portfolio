@@ -10,7 +10,7 @@ import {
   type KeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { Reorder, motion, useDragControls } from "framer-motion";
+import { Reorder, useDragControls } from "framer-motion";
 import { GripVertical, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
@@ -72,9 +72,9 @@ const WidgetBody = memo(function WidgetBody({
   return <Widget copy={copy} size={size} dragging={dragging} />;
 }, (a, b) => a.id === b.id && a.copy === b.copy && a.dragging === b.dragging && a.size.w === b.size.w && a.size.h === b.size.h);
 
+// Widgets are plain surface cards with a hairline; only the panel around them is glass.
 const cardClass =
-  "liquid-glass-card group/card relative flex select-none flex-col overflow-hidden rounded-[12px] border px-3 pb-3 pt-3 outline-none " +
-  "transition-[border-color] duration-[var(--duration-hover)] ease-[var(--ease-standard)] " +
+  "group/card relative flex select-none flex-col overflow-hidden rounded-[10px] border border-line bg-surface p-[9px] outline-none " +
   "hover:border-ink focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 
 function GripHandle({
@@ -96,6 +96,20 @@ function GripHandle({
       {...props}
     >
       <GripVertical className="size-3.5" aria-hidden="true" />
+    </span>
+  );
+}
+
+function HintChip({ icon, className, children }: { icon: React.ReactNode; className?: string; children: React.ReactNode }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex h-6 items-center gap-1 rounded-full border border-line px-2 text-[12px] font-medium leading-4",
+        className,
+      )}
+    >
+      {icon}
+      {children}
     </span>
   );
 }
@@ -125,6 +139,7 @@ function GridBoard({
   minRows,
   onGrow,
   onFit,
+  canResize,
 }: {
   items: Item[];
   setItems: (next: Item[]) => void;
@@ -134,6 +149,7 @@ function GridBoard({
   minRows: number;
   onGrow: (rows: number) => void;
   onFit: (rows: number) => void;
+  canResize: boolean;
 }) {
   const gridRef = useRef<HTMLDivElement>(null);
   const gesture = useRef<Gesture | null>(null);
@@ -146,10 +162,14 @@ function GridBoard({
   // While dragging or resizing the board holds its height (no jumping); on drop it fits the layout.
   const rows = Math.max(minRows, rowsOf(layout));
 
-  const leftOf = (item: Item) => (isRtl ? COLS - item.x - item.w : item.x) * CELL_W + INSET;
+  // Cards are placed with percentages (a column is a quarter of the board), so the first paint is
+  // already the final layout at any width. Pixel maths below reads the live board width instead.
+  const startOf = (x: number) => `calc(${x} * ${100 / COLS}% + ${INSET}px)`;
+  const widthOf = (w: number) => `calc(${w} * ${100 / COLS}% - ${INSET * 2}px)`;
   const topOf = (item: Item) => item.y * CELL_H + INSET;
-  const widthOf = (size: Size) => size.w * CELL_W - INSET * 2;
   const heightOf = (size: Size) => size.h * CELL_H - INSET * 2;
+
+  const boardWidth = () => gridRef.current?.clientWidth ?? COLS * CELL_W;
 
   const pointerInGrid = (event: { clientX: number; clientY: number }) => {
     const grid = gridRef.current;
@@ -159,7 +179,8 @@ function GridBoard({
   };
 
   const cellAt = (point: { x: number; y: number }) => {
-    const rawCol = Math.floor(point.x / CELL_W);
+    const cellW = boardWidth() / COLS;
+    const rawCol = Math.floor(point.x / cellW);
     const col = Math.max(0, Math.min(COLS - 1, isRtl ? COLS - 1 - rawCol : rawCol));
     const row = Math.max(0, Math.floor(point.y / CELL_H));
     return { col, row };
@@ -168,7 +189,7 @@ function GridBoard({
   const begin = (event: ReactPointerEvent<HTMLElement>, item: Item) => {
     if (event.button !== 0) return;
     const target = event.target as HTMLElement;
-    const onResize = Boolean(target.closest("[data-resize]"));
+    const onResize = canResize && Boolean(target.closest("[data-resize]"));
     const onHandle = Boolean(target.closest("[data-handle]"));
     const interactive = Boolean(target.closest("button, a, input, textarea, select"));
 
@@ -205,7 +226,9 @@ function GridBoard({
       const over = itemAt(items, col, row, current.id);
       setDrag({ id: current.id, dx, dy, overId: over?.id });
     } else {
-      const wantedW = isRtl ? ((COLS - item.x) * CELL_W - point.x) / CELL_W : (point.x - item.x * CELL_W) / CELL_W;
+      const width = boardWidth();
+      const cellW = width / COLS;
+      const wantedW = isRtl ? (width - point.x) / cellW - item.x : point.x / cellW - item.x;
       const wantedH = (point.y - item.y * CELL_H) / CELL_H;
       const size = nearestSize(item.id, item.x, { w: wantedW, h: wantedH });
 
@@ -213,11 +236,12 @@ function GridBoard({
       const options = SIZES[item.id];
       const fitting = options.filter((option) => item.x + option.w <= COLS);
       const widths = (fitting.length > 0 ? fitting : options).map((option) => option.w);
-      const minW = Math.min(...widths) * CELL_W - INSET * 2;
-      const maxW = Math.max(...widths) * CELL_W - INSET * 2;
+      const minW = Math.min(...widths) * cellW - INSET * 2;
+      const maxW = Math.max(...widths) * cellW - INSET * 2;
       const minH = Math.min(...options.map((option) => option.h)) * CELL_H - INSET * 2;
       const maxH = Math.max(...options.map((option) => option.h)) * CELL_H - INSET * 2;
-      const rawW = isRtl ? (COLS - item.x) * CELL_W - INSET - point.x : point.x - leftOf(item);
+      const inlineStart = item.x * cellW + INSET;
+      const rawW = (isRtl ? width - point.x : point.x) - inlineStart;
       const rawH = point.y - topOf(item);
       const px = {
         w: Math.max(minW, Math.min(maxW, rawW)),
@@ -272,6 +296,7 @@ function GridBoard({
     const direction = ARROWS[event.key];
     if (!direction) return;
     event.preventDefault();
+    if (event.shiftKey && !canResize) return;
     const key = isRtl && (direction === "left" || direction === "right")
       ? (direction === "left" ? "right" : "left")
       : direction;
@@ -285,7 +310,6 @@ function GridBoard({
 
   const draggedItem = drag ? items.find((item) => item.id === drag.id) : undefined;
   const resizeItem = resize ? items.find((item) => item.id === resize.id) : undefined;
-  const transition = reduced ? { duration: 0 } : SPRING;
 
   return (
     <div
@@ -317,11 +341,11 @@ function GridBoard({
       {draggedItem ? (
         <div
           aria-hidden="true"
-          className="absolute rounded-[12px] border border-dashed border-ink/30 bg-ink/[0.04]"
+          className="absolute rounded-[10px] border border-dashed border-ink/30 bg-ink/[0.04]"
           style={{
-            left: leftOf(draggedItem),
+            insetInlineStart: startOf(draggedItem.x),
             top: topOf(draggedItem),
-            width: widthOf(draggedItem),
+            width: widthOf(draggedItem.w),
             height: heightOf(draggedItem),
           }}
         />
@@ -330,11 +354,11 @@ function GridBoard({
       {resize && resizeItem ? (
         <div
           aria-hidden="true"
-          className="absolute flex items-end justify-end rounded-[12px] border-2 border-dashed border-brand/70 bg-tint/70 p-3"
+          className="absolute flex items-end justify-end rounded-[10px] border-2 border-dashed border-brand/70 bg-tint/70 p-3"
           style={{
-            left: isRtl ? (COLS - resizeItem.x - resize.size.w) * CELL_W + INSET : leftOf(resizeItem),
+            insetInlineStart: startOf(resizeItem.x),
             top: topOf(resizeItem),
-            width: widthOf(resize.size),
+            width: widthOf(resize.size.w),
             height: heightOf(resize.size),
           }}
         >
@@ -350,20 +374,11 @@ function GridBoard({
         const isResizing = resize?.id === item.id;
         const live = isResizing && resize ? resize : null;
         const isTarget = drag?.overId === item.id;
-        const x =
-          (live && isRtl ? (COLS - item.x) * CELL_W - INSET - live.px.w : leftOf(item)) +
-          (isDragging && drag ? drag.dx : 0);
-        const y = topOf(item) + (isDragging && drag ? drag.dy : 0);
-        const resizable = SIZES[item.id].length > 1;
-        const instant = { duration: 0 };
-        const cardTransition = isDragging
-          ? { x: instant, y: instant, default: transition }
-          : live
-            ? { x: instant, y: instant, width: instant, height: instant, default: transition }
-            : transition;
+        const resizable = canResize && SIZES[item.id].length > 1;
+        const following = isDragging || isResizing;
 
         return (
-          <motion.div
+          <div
             key={item.id}
             role="group"
             tabIndex={0}
@@ -371,26 +386,28 @@ function GridBoard({
             aria-describedby={hintId}
             className={cn(
               cardClass,
-              "hero-widget absolute left-0 top-0",
+              "hero-widget absolute",
+              // Cards glide to their cell; while one is held it follows the pointer with no easing.
+              following
+                ? "transition-[border-color] duration-150"
+                : "transition-[inset-inline-start,top,width,height,transform,border-color] duration-[420ms] ease-[var(--ease-spring-snap)]",
               isDragging && "z-30 cursor-grabbing border-ink shadow-[0_18px_40px_-12px_rgb(21_23_16/0.35)]",
               isResizing && "border-brand",
               isTarget && "border-brand ring-2 ring-brand/40",
             )}
             style={{
+              insetInlineStart: startOf(item.x),
+              top: topOf(item),
+              width: live ? live.px.w : widthOf(item.w),
+              height: live ? live.px.h : heightOf(size),
+              transform:
+                isDragging && drag
+                  ? `translate(${drag.dx}px, ${drag.dy}px)${reduced ? "" : " rotate(1.4deg) scale(1.02)"}`
+                  : "none",
               zIndex: isDragging ? 30 : isResizing ? 20 : 1,
               touchAction: "pan-y",
               "--i": order,
             } as CSSProperties}
-            initial={false}
-            animate={{
-              x,
-              y,
-              width: live ? live.px.w : widthOf(size),
-              height: live ? live.px.h : heightOf(size),
-              rotate: isDragging && !reduced ? 1.4 : 0,
-              scale: isDragging && !reduced ? 1.02 : 1,
-            }}
-            transition={cardTransition}
             onPointerDown={(event) => begin(event, item)}
             onPointerMove={move}
             onPointerUp={(event) => finish(event)}
@@ -418,7 +435,7 @@ function GridBoard({
                 <ResizeGlyph />
               </span>
             ) : null}
-          </motion.div>
+          </div>
         );
       })}
     </div>
@@ -523,6 +540,8 @@ export function DashboardBuilder({ className }: { className?: string }) {
   const { locale, isRtl } = useLocale();
   const copy = heroCopy[locale];
   const isList = useMatchMedia("(max-width: 639px)");
+  // Resizing needs a fine pointer and room; tablets keep drag only.
+  const canResize = useMatchMedia("(min-width: 1024px)", true);
   const [items, setItems] = useState<Item[]>(DEFAULT_LAYOUT);
   const [order, setOrder] = useState<WidgetId[]>(DEFAULT_ORDER);
   const [message, setMessage] = useState("");
@@ -544,7 +563,7 @@ export function DashboardBuilder({ className }: { className?: string }) {
   return (
     <section
       aria-label={copy.builder.title}
-      className={cn("liquid-glass-pill w-full rounded-[24px] p-4 sm:w-[536px]", className)}
+      className={cn("liquid-glass-pill w-full max-w-[840px] rounded-[24px] p-4 xl:max-w-[600px]", className)}
     >
       <div className="flex min-h-[18px] items-center justify-between gap-3 text-[14px] leading-[18px]">
         <h2 className="font-semibold text-ink">{copy.builder.title}</h2>
@@ -558,7 +577,16 @@ export function DashboardBuilder({ className }: { className?: string }) {
             {copy.builder.reset}
           </button>
         ) : (
-          <p className="text-muted">{isList ? copy.builder.hintMobile : copy.builder.hintDesktop}</p>
+          isList ? (
+            <p className="text-muted">{copy.builder.hintMobile}</p>
+          ) : (
+            <div aria-hidden="true" className="flex items-center gap-1.5 text-muted">
+              <HintChip icon={<GripVertical className="size-3" aria-hidden="true" />}>{copy.builder.chipDrag}</HintChip>
+              <HintChip icon={<ResizeGlyph />} className="hidden lg:inline-flex">
+                {copy.builder.chipResize}
+              </HintChip>
+            </div>
+          )
         )}
       </div>
 
@@ -566,7 +594,17 @@ export function DashboardBuilder({ className }: { className?: string }) {
         {isList ? (
           <ListBoard order={order} setOrder={setOrder} copy={copy} announce={setMessage} />
         ) : (
-          <GridBoard items={items} setItems={setItems} copy={copy} isRtl={isRtl} announce={setMessage} minRows={heldRows} onGrow={grow} onFit={fit} />
+          <GridBoard
+            items={items}
+            setItems={setItems}
+            copy={copy}
+            isRtl={isRtl}
+            announce={setMessage}
+            minRows={heldRows}
+            onGrow={grow}
+            onFit={fit}
+            canResize={canResize}
+          />
         )}
       </div>
 

@@ -19,6 +19,8 @@ export type HeroCopy = {
   builder: {
     title: string;
     hintDesktop: string;
+    chipDrag: string;
+    chipResize: string;
     hintMobile: string;
     reset: string;
     moveHint: string;
@@ -101,6 +103,8 @@ export const heroCopy: Record<Locale, HeroCopy> = {
     builder: {
       title: "Dashboard builder",
       hintDesktop: "drag to swap · corner to resize",
+      chipDrag: "Drag",
+      chipResize: "Resize",
       hintMobile: "drag to reorder",
       reset: "Reset layout",
       moveHint: "Arrow keys move this widget. Shift plus arrow keys resize it.",
@@ -185,6 +189,8 @@ export const heroCopy: Record<Locale, HeroCopy> = {
     builder: {
       title: "أداة بناء اللوحات",
       hintDesktop: "اسحب للتبديل · الزاوية لتغيير الحجم",
+      chipDrag: "اسحب",
+      chipResize: "غيّر الحجم",
       hintMobile: "اسحب لإعادة الترتيب",
       reset: "إعادة ضبط التخطيط",
       moveHint: "استخدم مفاتيح الأسهم لتحريك هذه البطاقة، وShift مع الأسهم لتغيير حجمها.",
