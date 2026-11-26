@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 
 type ContactCopy = {
   title: string;
-  aside: string;
   chip: string;
   headline: string;
   copy: string;
@@ -27,7 +26,6 @@ type ContactCopy = {
 const copy: Record<Locale, ContactCopy> = {
   en: {
     title: "Contact",
-    aside: "Open to remote roles worldwide. Write here or reach me directly.",
     chip: "Available for worldwide remote roles",
     headline: "Let's build something together.",
     copy: "Copy",
@@ -40,7 +38,6 @@ const copy: Record<Locale, ContactCopy> = {
   },
   ar: {
     title: "تواصل",
-    aside: "متاح لفرص العمل عن بُعد حول العالم. اكتب لي هنا أو راسلني مباشرة.",
     chip: "متاح لفرص العمل عن بُعد حول العالم",
     headline: "لنبنِ شيئًا معًا.",
     copy: "نسخ",
@@ -145,17 +142,17 @@ export function ContactSection() {
   return (
     <section id="contact" aria-labelledby="contact-title" className="scroll-mt-[88px] py-14 md:py-20">
       <Container>
-        <SectionHead id="contact-title" title={text.title} aside={text.aside} />
+        <SectionHead id="contact-title" title={text.title} />
 
         <div className="grid gap-x-12 gap-y-10 pt-10 lg:grid-cols-12 lg:pt-14">
           {/* Who and how: availability, headline, the address with a one-tap copy. */}
-          <Reveal className="flex flex-col items-start gap-6 lg:col-span-5 lg:self-start">
+          <Reveal className="flex flex-col items-start gap-6 lg:col-span-5 lg:col-start-1 lg:row-start-1 lg:self-start">
             <p className="inline-flex items-center gap-2.5 rounded-full border border-line bg-surface px-4 py-2 text-[15px] font-medium leading-5 text-ink">
               <span aria-hidden="true" className="size-2 rounded-full bg-brand" />
               {text.chip}
             </p>
 
-            <h3 className="text-balance text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-ink rtl:leading-[1.5] rtl:tracking-normal md:text-[40px]">
+            <h3 className="text-balance text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-ink rtl:leading-[1.5] rtl:tracking-normal md:text-[40px] lg:text-[40px] xl:text-[48px]">
               {text.headline}
             </h3>
 
@@ -164,7 +161,7 @@ export function ContactSection() {
                 href={`mailto:${site.email}`}
                 dir="ltr"
                 className={cn(
-                  "max-w-full break-all text-[22px] font-semibold leading-8 tracking-[-0.01em] text-brand-text underline decoration-line decoration-2 underline-offset-[6px] min-[420px]:text-[26px] md:text-[30px] md:leading-10 lg:text-[24px] xl:text-[30px]",
+                  "inline-flex min-h-11 max-w-full items-center break-all text-[22px] font-semibold leading-8 tracking-[-0.01em] text-brand-text underline decoration-line decoration-2 underline-offset-[6px] min-[420px]:text-[26px] md:text-[30px] md:leading-10 lg:text-[26px] xl:text-[32px]",
                   hoverEase,
                   "hover:decoration-brand focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                 )}
@@ -176,8 +173,7 @@ export function ContactSection() {
                 onClick={copyEmail}
                 aria-label={text.copyLabel}
                 className={cn(
-                  "relative inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface px-4 text-[15px] font-semibold leading-5 text-ink",
-                  "after:absolute after:-inset-y-0.5 after:inset-x-0 after:content-['']",
+                  "inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-surface px-4 text-[15px] font-semibold leading-5 text-ink",
                   "transition-[background-color,border-color,transform] duration-[var(--duration-hover)] ease-[var(--ease-standard)] hover:border-brand hover:bg-tint active:scale-[0.97] motion-reduce:active:scale-100",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                 )}
@@ -195,18 +191,7 @@ export function ContactSection() {
             </div>
           </Reveal>
 
-          {/* The form is always on the page; on phones it follows the address, on desktop it sits beside it. */}
-          <Reveal
-            className="rounded-[24px] border border-line bg-surface p-5 min-[375px]:p-6 md:p-8 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:p-10"
-            delay={80}
-          >
-            <h3 className="mb-6 text-[22px] font-semibold leading-7 tracking-[-0.02em] text-ink rtl:leading-9 rtl:tracking-normal">
-              {text.formTitle}
-            </h3>
-            <ContactForm />
-          </Reveal>
-
-          <Reveal className="lg:col-span-5 lg:self-end" delay={60}>
+          <Reveal className="lg:col-span-5 lg:col-start-1 lg:row-start-2 lg:self-end" delay={60}>
             <ul className="border-t border-line">
               {profiles.map((link) => (
                 <Row
@@ -237,6 +222,17 @@ export function ContactSection() {
                 value={text.locationValue}
               />
             </ul>
+          </Reveal>
+
+          {/* On phones the links come first, then the form; on desktop the form sits beside both. */}
+          <Reveal
+            className="rounded-[24px] border border-line bg-surface p-5 min-[375px]:p-6 md:max-w-[600px] md:p-8 lg:max-w-none lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:p-10"
+            delay={80}
+          >
+            <h3 className="mb-6 text-[22px] font-semibold leading-7 tracking-[-0.02em] text-ink rtl:leading-9 rtl:tracking-normal">
+              {text.formTitle}
+            </h3>
+            <ContactForm />
           </Reveal>
         </div>
       </Container>
