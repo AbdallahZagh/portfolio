@@ -10,7 +10,6 @@ import {
   type KeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { Reorder, useDragControls } from "framer-motion";
 import { GripVertical, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
@@ -20,10 +19,8 @@ import {
   CELL_W,
   COLS,
   DEFAULT_LAYOUT,
-  DEFAULT_ORDER,
   INSET,
   MIN_ROWS,
-  MOBILE_HEIGHT,
   SIZES,
   itemAt,
   moveByKey,
@@ -40,15 +37,6 @@ import {
 } from "./layout";
 import { WIDGETS, widgetTitle } from "./widgets";
 import { useMatchMedia, usePrefersReducedMotion } from "./use-live-data";
-
-const SPRING = { type: "spring", stiffness: 420, damping: 32 } as const;
-const MOBILE_SIZE: Record<WidgetId, Size> = {
-  telemetry: { w: 2, h: 2 },
-  tanks: { w: 2, h: 2 },
-  scope: { w: 4, h: 1 },
-  reactor: { w: 2, h: 2 },
-  vitals: { w: 2, h: 1 },
-};
 
 const ARROWS: Record<string, Direction> = {
   ArrowLeft: "left",
@@ -72,9 +60,9 @@ const WidgetBody = memo(function WidgetBody({
   return <Widget copy={copy} size={size} dragging={dragging} />;
 }, (a, b) => a.id === b.id && a.copy === b.copy && a.dragging === b.dragging && a.size.w === b.size.w && a.size.h === b.size.h);
 
-// Widgets are plain surface cards with a hairline; only the panel around them is glass.
+// Widgets keep a soft translucent fill with a hairline. No blur and no white glow on the cards.
 const cardClass =
-  "group/card relative flex select-none flex-col overflow-hidden rounded-[10px] border border-line bg-surface p-[9px] outline-none " +
+  "group/card relative flex select-none flex-col overflow-hidden rounded-[12px] border border-line bg-surface/60 p-3 outline-none " +
   "hover:border-ink focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 
 function GripHandle({
@@ -443,119 +431,24 @@ function GridBoard({
 }
 
 // ---------------------------------------------------------------------------
-// Mobile: single column, drag the handle to reorder.
-// ---------------------------------------------------------------------------
-
-function ListCard({
-  id,
-  copy,
-  index,
-  total,
-  onMove,
-  announce,
-}: {
-  id: WidgetId;
-  copy: HeroCopy;
-  index: number;
-  total: number;
-  onMove: (from: number, to: number) => void;
-  announce: (message: string) => void;
-}) {
-  const controls = useDragControls();
-  const [dragging, setDragging] = useState(false);
-  const reduced = usePrefersReducedMotion();
-  const hintId = useId();
-
-  const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.target !== event.currentTarget) return;
-    const to = event.key === "ArrowUp" ? index - 1 : event.key === "ArrowDown" ? index + 1 : index;
-    if (to === index || to < 0 || to >= total) return;
-    event.preventDefault();
-    onMove(index, to);
-    announce(`${widgetTitle(copy, id)}: ${copy.builder.moved}`);
-  };
-
-  return (
-    <Reorder.Item
-      as="div"
-      value={id}
-      dragListener={false}
-      dragControls={controls}
-      role="group"
-      tabIndex={0}
-      aria-label={widgetTitle(copy, id)}
-      aria-describedby={hintId}
-      className={cn(cardClass, "hero-widget", dragging && "z-30 border-ink shadow-[0_18px_40px_-12px_rgb(21_23_16/0.35)]")}
-      style={{ height: MOBILE_HEIGHT[id], "--i": index } as CSSProperties}
-      whileDrag={reduced ? undefined : { scale: 1.02, rotate: 1.2 }}
-      transition={reduced ? { duration: 0 } : SPRING}
-      onDragStart={() => setDragging(true)}
-      onDragEnd={() => setDragging(false)}
-      onKeyDown={onKeyDown}
-    >
-      <p id={hintId} className="sr-only">
-        {copy.builder.moveHintList}
-      </p>
-      <GripHandle label={copy.builder.handle} onPointerDown={(event) => controls.start(event)} />
-      <WidgetBody id={id} copy={copy} size={MOBILE_SIZE[id]} dragging={dragging} />
-    </Reorder.Item>
-  );
-}
-
-function ListBoard({
-  order,
-  setOrder,
-  copy,
-  announce,
-}: {
-  order: WidgetId[];
-  setOrder: (next: WidgetId[]) => void;
-  copy: HeroCopy;
-  announce: (message: string) => void;
-}) {
-  const onMove = useCallback(
-    (from: number, to: number) => {
-      const next = order.slice();
-      const [moved] = next.splice(from, 1);
-      next.splice(to, 0, moved);
-      setOrder(next);
-    },
-    [order, setOrder],
-  );
-
-  return (
-    <Reorder.Group as="div" axis="y" values={order} onReorder={setOrder} className="flex flex-col gap-3">
-      {order.map((id, index) => (
-        <ListCard key={id} id={id} copy={copy} index={index} total={order.length} onMove={onMove} announce={announce} />
-      ))}
-    </Reorder.Group>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Panel
 // ---------------------------------------------------------------------------
 
-export function DashboardBuilder({ className }: { className?: string }) {
+function BuilderPanel({ className }: { className?: string }) {
   const { locale, isRtl } = useLocale();
   const copy = heroCopy[locale];
-  const isList = useMatchMedia("(max-width: 639px)");
   // Resizing needs a fine pointer and room; tablets keep drag only.
   const canResize = useMatchMedia("(min-width: 1024px)", true);
   const [items, setItems] = useState<Item[]>(DEFAULT_LAYOUT);
-  const [order, setOrder] = useState<WidgetId[]>(DEFAULT_ORDER);
   const [message, setMessage] = useState("");
   const [heldRows, setHeldRows] = useState(MIN_ROWS);
   const grow = useCallback((rows: number) => setHeldRows((previous) => Math.max(previous, rows)), []);
   const fit = useCallback((rows: number) => setHeldRows(Math.max(MIN_ROWS, rows)), []);
 
-  const changed = isList
-    ? order.some((id, index) => id !== DEFAULT_ORDER[index])
-    : !sameLayout(items, DEFAULT_LAYOUT);
+  const changed = !sameLayout(items, DEFAULT_LAYOUT);
 
   const reset = () => {
     setItems(DEFAULT_LAYOUT);
-    setOrder(DEFAULT_ORDER);
     setHeldRows(MIN_ROWS);
     setMessage(copy.builder.reset);
   };
@@ -577,35 +470,25 @@ export function DashboardBuilder({ className }: { className?: string }) {
             {copy.builder.reset}
           </button>
         ) : (
-          isList ? (
-            <p className="text-muted">{copy.builder.hintMobile}</p>
-          ) : (
-            <div aria-hidden="true" className="flex items-center gap-1.5 text-muted">
-              <HintChip icon={<GripVertical className="size-3" aria-hidden="true" />}>{copy.builder.chipDrag}</HintChip>
-              <HintChip icon={<ResizeGlyph />} className="hidden lg:inline-flex">
-                {copy.builder.chipResize}
-              </HintChip>
-            </div>
-          )
+          <div aria-hidden="true" className="flex items-center gap-1.5 text-muted">
+            <HintChip icon={<GripVertical className="size-3" aria-hidden="true" />}>{copy.builder.chipDrag}</HintChip>
+            <HintChip icon={<ResizeGlyph />}>{copy.builder.chipResize}</HintChip>
+          </div>
         )}
       </div>
 
       <div className="mt-4">
-        {isList ? (
-          <ListBoard order={order} setOrder={setOrder} copy={copy} announce={setMessage} />
-        ) : (
-          <GridBoard
-            items={items}
-            setItems={setItems}
-            copy={copy}
-            isRtl={isRtl}
-            announce={setMessage}
-            minRows={heldRows}
-            onGrow={grow}
-            onFit={fit}
-            canResize={canResize}
-          />
-        )}
+        <GridBoard
+          items={items}
+          setItems={setItems}
+          copy={copy}
+          isRtl={isRtl}
+          announce={setMessage}
+          minRows={heldRows}
+          onGrow={grow}
+          onFit={fit}
+          canResize={canResize}
+        />
       </div>
 
       <p className="mt-3 text-[12px] leading-4 text-muted">{copy.builder.privacy}</p>
@@ -615,4 +498,13 @@ export function DashboardBuilder({ className }: { className?: string }) {
       </p>
     </section>
   );
+}
+
+/**
+ * The builder is a desktop tool (1024px and up). Below that the hero shows the Nova preview instead,
+ * and none of this mounts, so phones run none of its timers or listeners.
+ */
+export function DashboardBuilder({ className }: { className?: string }) {
+  const desktop = useMatchMedia("(min-width: 1024px)", true);
+  return desktop ? <BuilderPanel className={className} /> : null;
 }

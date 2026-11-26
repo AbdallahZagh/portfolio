@@ -25,8 +25,6 @@ import { changeTheme } from "@/lib/theme-transition";
 
 const NAV_OFFSET = -90;
 const SECTION_IDS = ["experience", "projects", "skills", "contact"] as const;
-/** The bar turns frosted after this much scroll. */
-const FROST_AT = 24;
 /** Time the sheet needs to finish its closing animation before it leaves the DOM. */
 const SHEET_MS = 520;
 
@@ -44,7 +42,7 @@ const copy = {
     dark: "Dark",
     language: "Language",
     talk: "Get in touch",
-    switchLanguage: "ع",
+    switchLanguage: "عربي",
     switchLanguageLabel: "Switch language to Arabic",
     primary: "Primary",
     close: "Close menu",
@@ -117,37 +115,9 @@ function useActiveSection() {
   return [active, hold] as const;
 }
 
-/** Frosted bar after FROST_AT px, and a collapsed name once the hero has scrolled away. */
-function useBarState() {
-  const [frosted, setFrosted] = useState(false);
-  const [pastHero, setPastHero] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setFrosted(window.scrollY >= FROST_AT);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    const hero = document.getElementById("home");
-    let observer: IntersectionObserver | undefined;
-    if (hero) {
-      observer = new IntersectionObserver(([entry]) => setPastHero(!entry.isIntersecting), {
-        rootMargin: "-56px 0px 0px 0px",
-      });
-      observer.observe(hero);
-    }
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      observer?.disconnect();
-    };
-  }, []);
-
-  return { frosted, pastHero };
-}
-
 export function Navbar() {
   const { locale, setLocale } = useLocale();
   const [active, hold] = useActiveSection();
-  const { frosted, pastHero } = useBarState();
   const lenis = useLenis();
   const reduce = useReducedMotion();
   const text = copy[locale];
@@ -249,13 +219,12 @@ export function Navbar() {
 
   return (
     <>
-      <header className="nav-drop fixed inset-x-0 top-0 z-40 h-14" data-frosted={frosted}>
-        <div aria-hidden="true" className="nav-frost" />
+      <header className="pointer-events-none fixed inset-x-0 top-0 z-40 bg-transparent px-4 pt-3 lg:px-8 lg:pt-4">
         <nav
           aria-label={text.primary}
-          className="relative mx-auto flex h-full w-full max-w-[1440px] items-center justify-between px-5 sm:px-8 xl:px-14"
+          className="nav-drop liquid-glass-pill pointer-events-auto relative mx-auto flex h-16 w-full max-w-[1328px] items-center justify-between rounded-full px-3 lg:h-[70px] lg:px-4"
         >
-          <Monogram name={text.name} collapsed={pastHero} onClick={(event) => follow(event, "#home")} />
+          <Monogram name={text.name} withName onClick={(event) => follow(event, "#home")} />
 
           <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 lg:flex">
             {links.map((link) => {
@@ -287,29 +256,24 @@ export function Navbar() {
             })}
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="hidden items-center rounded-full ring-1 ring-inset ring-line lg:flex">
-              <ThemeIconButton />
-              <span aria-hidden="true" className="h-5 w-px bg-line" />
-              <button
-                type="button"
-                onClick={toggleLocale}
-                aria-label={text.switchLanguageLabel}
-                lang={locale === "en" ? "ar" : "en"}
-                className={cn(
-                  "inline-flex h-11 min-w-11 items-center justify-center rounded-full px-3 text-[15px] font-medium leading-5 text-ink",
-                  "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)] hover:bg-glass-fill active:bg-glass-active",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-                  locale === "en" && "font-arabic text-[17px]",
-                )}
-              >
-                {text.switchLanguage}
-              </button>
-            </div>
-
+          <div className="flex items-center gap-1">
+            <ThemeIconButton className="hidden lg:inline-flex" />
+            <button
+              type="button"
+              onClick={toggleLocale}
+              aria-label={text.switchLanguageLabel}
+              lang={locale === "en" ? "ar" : "en"}
+              className={cn(
+                "hidden h-11 min-w-14 items-center justify-center rounded-full px-3 text-[16px] font-medium leading-5 text-ink lg:inline-flex",
+                "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)] hover:bg-glass-fill active:bg-glass-active",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+                locale === "en" && "font-arabic",
+              )}
+            >
+              {text.switchLanguage}
+            </button>
             <Cta
               href="#contact"
-              size="sm"
               className="hidden min-[360px]:inline-flex"
               onClick={(event) => follow(event, "#contact")}
             >
@@ -452,34 +416,28 @@ export function Navbar() {
 
 function Monogram({
   name,
-  collapsed = false,
+  withName = false,
   onClick,
 }: {
   name: string;
-  /** Hides the written name, leaving the AZ mark. Only the header bar uses it. */
-  collapsed?: boolean;
+  withName?: boolean;
   onClick: (event: MouseEvent<HTMLAnchorElement>) => void;
 }) {
-  const showsName = collapsed !== undefined;
   return (
     <a
       href="#home"
       onClick={onClick}
       aria-label={name}
-      className="flex h-11 min-w-11 items-center justify-center rounded-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+      className="flex h-11 min-w-11 items-center gap-3 rounded-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
     >
       <span
         aria-hidden="true"
-        className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-brand text-[16px] font-semibold leading-5 text-on-brand"
+        className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-brand text-[17px] font-semibold leading-5 text-on-brand"
       >
         AZ
       </span>
-      {showsName ? (
-        <span
-          aria-hidden="true"
-          data-collapsed={collapsed}
-          className="nav-name whitespace-nowrap text-[17px] font-medium leading-[22px] text-ink"
-        >
+      {withName ? (
+        <span aria-hidden="true" className="hidden text-[17px] font-medium leading-[22px] text-ink sm:inline">
           {name}
         </span>
       ) : null}

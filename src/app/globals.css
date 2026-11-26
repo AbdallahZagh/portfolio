@@ -234,26 +234,14 @@ h6 {
   font-family: var(--font-arabic);
 }
 
+/* Glass, kept quiet: a light fill, a soft blur and a hairline. No white rim, no inner glow. */
 .liquid-glass-pill {
   background-color: var(--glass-fill);
-  -webkit-backdrop-filter: blur(14px) saturate(1.5);
-  backdrop-filter: blur(14px) saturate(1.5);
-  border: 1px solid var(--glass-stroke);
-  box-shadow:
-    inset 0 1.5px 0 rgb(255 255 255 / 0.95),
-    inset 0 0 10px rgb(255 255 255 / 0.55),
-    inset 0 -2px 6px color-mix(in srgb, var(--brand) 15%, transparent),
-    0 16px 40px -14px rgb(42 48 26 / 0.14);
+  -webkit-backdrop-filter: blur(8px) saturate(1.15);
+  backdrop-filter: blur(8px) saturate(1.15);
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 28px -20px rgb(0 0 0 / 0.28);
 }
-
-/* The only blurred surfaces are the navbar and this panel. A lighter blur keeps phones cool. */
-@media (max-width: 767px) {
-  .liquid-glass-pill {
-    -webkit-backdrop-filter: blur(8px) saturate(1.4);
-    backdrop-filter: blur(8px) saturate(1.4);
-  }
-}
-
 
 /* Tank liquid surface: wave slides sideways, speed set by --wave-speed. */
 @keyframes tank-wave {
@@ -365,54 +353,6 @@ svg {
 
 .nav-drop {
   animation: drop 400ms var(--ease-out-expo) both;
-}
-
-/* Navbar: clear at the top, frosted once the page has scrolled. A separate layer fades in, so the
-   blur never has to animate. No heavy shadow, just a hairline and a faint top highlight. */
-.nav-frost {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  background-color: color-mix(in srgb, var(--bg) 70%, transparent);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  backdrop-filter: blur(16px) saturate(140%);
-  border-bottom: 1px solid var(--line);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
-  transition: opacity 240ms cubic-bezier(0.2, 0, 0, 1);
-  pointer-events: none;
-}
-
-[data-theme="dark"] .nav-frost {
-  background-color: color-mix(in srgb, var(--bg) 55%, transparent);
-}
-
-[data-frosted="true"] > .nav-frost {
-  opacity: 1;
-}
-
-/* The written name folds away into the AZ mark once the hero is behind. */
-.nav-name {
-  display: none;
-  overflow: hidden;
-  max-width: 240px;
-  margin-inline-start: 12px;
-  opacity: 1;
-  transition:
-    max-width 300ms var(--ease-standard),
-    margin-inline-start 300ms var(--ease-standard),
-    opacity 300ms var(--ease-standard);
-}
-
-@media (min-width: 640px) {
-  .nav-name {
-    display: block;
-  }
-}
-
-.nav-name[data-collapsed="true"] {
-  max-width: 0;
-  margin-inline-start: 0;
-  opacity: 0;
 }
 
 /* Menu: a circle opens from the burger on phones, a side panel with a scrim slides in on tablets. */
