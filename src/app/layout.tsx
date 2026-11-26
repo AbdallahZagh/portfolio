@@ -139,6 +139,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="dark"
       className={`${hostGrotesk.variable} ${notoSansArabic.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
