@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { LocaleProvider } from "@/components/locale-provider";
+import { localeBootScript } from "@/lib/locale-boot";
 import { publicAsset } from "@/lib/public-asset";
 import { site, socialLinks } from "@/data/portfolio";
 
@@ -142,6 +143,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: localeBootScript }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
       <body className="antialiased bg-background text-foreground">

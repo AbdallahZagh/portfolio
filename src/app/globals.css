@@ -672,3 +672,5 @@ html.theme-switching body {
   letter-spacing: 0;
   text-transform: none;
 }
+
+html[data-locale-pending] body { visibility: hidden; }
