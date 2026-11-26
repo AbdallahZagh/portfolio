@@ -8,7 +8,7 @@ import { publicAsset } from "@/lib/public-asset";
 import { site } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 import { heroCopy } from "./hero-copy";
-import { DashboardBuilder } from "./builder/dashboard-builder";
+import { LazyBuilder } from "./builder/lazy-builder";
 import { HeroPreview } from "./hero-preview";
 
 export function HeroSection() {
@@ -89,7 +89,7 @@ export function HeroSection() {
         <div className="min-w-0 xl:col-span-6 xl:flex xl:justify-end">
           <HeroPreview className="lg:hidden" />
           <div className="hidden w-full lg:block">
-            <DashboardBuilder className="xl:ms-auto" />
+            <LazyBuilder className="xl:ms-auto" />
           </div>
         </div>
       </div>

@@ -279,6 +279,9 @@ h6 {
 }
 
 /* Tank liquid surface: wave slides sideways, speed set by --wave-speed. */
+/* Off-screen or background tab: freeze the wave (set from use-live-data). */
+[data-live="false"] .tank-wave { animation-play-state: paused; }
+
 @keyframes tank-wave {
   from {
     transform: translateX(0);

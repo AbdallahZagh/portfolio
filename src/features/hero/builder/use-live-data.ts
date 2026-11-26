@@ -57,9 +57,17 @@ export function useCountUp(target: number | undefined, duration = 900) {
 // Pause: the live widgets only tick while the hero is on screen.
 // ---------------------------------------------------------------------------
 
+/** "Running" means the hero is on screen AND the tab is visible. CSS loops (the tank wave) follow `data-live`. */
 let heroInView = true;
+let heroIntersecting = true;
 const heroListeners = new Set<() => void>();
 let heroObserver: IntersectionObserver | null = null;
+
+function publishHero() {
+  heroInView = heroIntersecting && !document.hidden;
+  document.documentElement.dataset.live = heroInView ? "true" : "false";
+  heroListeners.forEach((listener) => listener());
+}
 
 function subscribeHero(onChange: () => void) {
   heroListeners.add(onChange);
@@ -67,10 +75,11 @@ function subscribeHero(onChange: () => void) {
     const hero = document.getElementById("home");
     if (hero) {
       heroObserver = new IntersectionObserver(([entry]) => {
-        heroInView = entry.isIntersecting;
-        heroListeners.forEach((listener) => listener());
+        heroIntersecting = entry.isIntersecting;
+        publishHero();
       });
       heroObserver.observe(hero);
+      document.addEventListener("visibilitychange", publishHero);
     }
   }
   return () => {
@@ -78,7 +87,10 @@ function subscribeHero(onChange: () => void) {
     if (heroListeners.size === 0 && heroObserver) {
       heroObserver.disconnect();
       heroObserver = null;
+      document.removeEventListener("visibilitychange", publishHero);
+      heroIntersecting = true;
       heroInView = true;
+      document.documentElement.dataset.live = "true";
     }
   };
 }
