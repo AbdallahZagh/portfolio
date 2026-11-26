@@ -515,3 +515,56 @@ export const languages = {
     ar: "العربية: اللغة الأم · الإنجليزية: C1",
   } as Localized,
 };
+
+// ---------------------------------------------------------------------------
+// Skills as six chip groups (every CV skill is kept; the long ones fold behind "+N")
+// ---------------------------------------------------------------------------
+
+export type SkillChipGroup = { id: string; label: Localized; items: Localized<string[]> };
+
+const itemsOf = (...ids: string[]) => ids.flatMap((id) => skillGroups.find((group) => group.id === id)?.items ?? []);
+const same = (items: string[]): Localized<string[]> => ({ en: items, ar: items });
+
+export const skillChipGroups: SkillChipGroup[] = [
+  {
+    id: "frontend",
+    label: { en: "Frontend", ar: "الواجهة الأمامية" },
+    items: same(itemsOf("frontend", "localization", "mobile-desktop")),
+  },
+  {
+    id: "state-data",
+    label: { en: "State & data", ar: "الحالة والبيانات" },
+    items: same([...itemsOf("state-data"), "Socket.IO", "Supabase Realtime"]),
+  },
+  {
+    id: "ui-motion",
+    label: { en: "UI & motion", ar: "الواجهة والحركة" },
+    items: same([...itemsOf("ui-motion"), "Mapbox GL", "Three.js"]),
+  },
+  {
+    id: "backend",
+    label: { en: "Backend", ar: "الخلفية" },
+    items: same(itemsOf("backend", "integrations-ai")),
+  },
+  {
+    id: "testing",
+    label: { en: "Testing", ar: "الاختبار" },
+    items: same(itemsOf("testing")),
+  },
+  {
+    id: "tools",
+    label: { en: "Tools", ar: "الأدوات" },
+    items: {
+      en: itemsOf("tooling", "leadership"),
+      ar: [
+        ...itemsOf("tooling"),
+        "قيادة الفريق",
+        "إدارة المزوّدين",
+        "المتطلبات وطلبات التغيير",
+        "ضمان جودة السبرنت",
+        "مراجعات الشيفرة والتصميم",
+        "Agile/Scrum",
+      ],
+    },
+  },
+];

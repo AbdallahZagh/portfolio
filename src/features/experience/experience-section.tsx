@@ -4,12 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { SectionHead } from "@/components/ui/section-heading";
 import { useLocale, type Locale } from "@/components/locale-provider";
+import { ExperienceBullets } from "@/features/experience/experience-bullets";
 import { CertificatePreview } from "@/features/experience/certificate-preview";
 import { experiences } from "@/data/portfolio";
 
 const copy: Record<
   Locale,
-  { title: string; aside: string; certificate: string; dialog: string; close: string }
+  { title: string; aside: string; certificate: string; dialog: string; close: string; showAll: (count: number) => string; showLess: string }
 > = {
   en: {
     title: "Experience",
@@ -18,6 +19,8 @@ const copy: Record<
     certificate: "Internship certificate",
     dialog: "Internship certificate",
     close: "Close",
+    showAll: (count) => `Show all (${count})`,
+    showLess: "Show less",
   },
   ar: {
     title: "الخبرة",
@@ -26,6 +29,8 @@ const copy: Record<
     certificate: "شهادة التدريب",
     dialog: "شهادة إتمام التدريب",
     close: "إغلاق",
+    showAll: (count) => `عرض الكل (${count})`,
+    showLess: "عرض أقل",
   },
 };
 
@@ -67,13 +72,7 @@ export function ExperienceSection() {
               </div>
 
               <div className="flex min-w-0 flex-col items-start gap-4">
-                <ul className="flex list-disc flex-col gap-2 ps-[18px] marker:text-line">
-                  {job.bullets[locale].map((bullet) => (
-                    <li key={bullet} className="text-[17px] leading-[26px] text-muted">
-                      {bullet}
-                    </li>
-                  ))}
-                </ul>
+                <ExperienceBullets bullets={job.bullets[locale]} showAll={text.showAll} showLess={text.showLess} />
                 {job.certificate ? (
                   <CertificatePreview
                     src={job.certificate.src}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
@@ -22,6 +22,8 @@ const copy: Record<
     gallery: string;
     whatItDoes: string;
     whatIBuilt: string;
+    stack: string;
+    privateRepo: string;
   }
 > = {
   en: {
@@ -33,6 +35,8 @@ const copy: Record<
     gallery: "Nova screenshots",
     whatItDoes: "What it does",
     whatIBuilt: "What I built",
+    stack: "Stack",
+    privateRepo: "Private repo",
   },
   ar: {
     title: "المشاريع",
@@ -43,6 +47,8 @@ const copy: Record<
     gallery: "لقطات شاشة من Nova",
     whatItDoes: "ما يفعله",
     whatIBuilt: "ما بنيتُه",
+    stack: "التقنيات",
+    privateRepo: "مستودع خاص",
   },
 };
 
@@ -132,7 +138,7 @@ function Row({
   open: boolean;
   onToggle: () => void;
   githubLabel: string;
-  labels: { whatItDoes: string; whatIBuilt: string };
+  labels: { whatItDoes: string; whatIBuilt: string; stack: string; privateRepo: string };
 }) {
   const { locale } = useLocale();
   const panelId = useId();
@@ -146,22 +152,29 @@ function Row({
         aria-controls={panelId}
         onClick={onToggle}
         className={cn(
-          "group flex w-full cursor-pointer flex-col gap-2 rounded-lg px-4 py-5 text-start",
+          "group relative flex min-h-14 w-full cursor-pointer flex-col gap-2 rounded-lg px-4 py-5 pe-12 text-start",
           "transition-[padding,background-color] duration-[var(--duration-row-indent)] ease-[var(--ease-standard)]",
           "active:bg-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
           "lg:flex-row lg:items-center lg:gap-0 lg:py-8 lg:hover:ps-10 lg:aria-expanded:ps-10 motion-reduce:lg:hover:ps-4 motion-reduce:lg:aria-expanded:ps-4",
         )}
       >
         <span className="hidden w-20 shrink-0 text-[18px] leading-[27px] text-muted lg:block">{row.index}</span>
-        <span
-          className={cn(
-            "min-w-0 flex-1 text-[32px] font-semibold leading-[34px] tracking-[-0.03em] text-ink rtl:leading-[48px] rtl:tracking-normal",
-            "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)]",
-            "group-hover:text-brand-text group-aria-expanded:text-brand-text",
-            "lg:text-[48px] lg:leading-[53px] rtl:lg:leading-[68px]",
-          )}
-        >
-          {row.title[locale]}
+        <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <span
+            className={cn(
+              "text-[32px] font-semibold leading-[34px] tracking-[-0.03em] text-ink rtl:leading-[48px] rtl:tracking-normal",
+              "transition-colors duration-[var(--duration-hover)] ease-[var(--ease-standard)]",
+              "group-hover:text-brand-text group-aria-expanded:text-brand-text",
+              "lg:text-[48px] lg:leading-[53px] rtl:lg:leading-[68px]",
+            )}
+          >
+            {row.title[locale]}
+          </span>
+          {row.tags ? (
+            <span className="text-[15px] leading-[22px] text-muted">
+              {labels.stack} · <bdi>{row.tags.join(" · ")}</bdi>
+            </span>
+          ) : null}
         </span>
         <span className="text-[15px] font-medium leading-5 text-muted lg:hidden">
           {row.index} · {row.category[locale]}
@@ -169,6 +182,11 @@ function Row({
         <span className="hidden w-[240px] shrink-0 text-end text-[18px] leading-[27px] text-muted lg:block">
           {row.category[locale]}
         </span>
+        <ArrowUpRight
+          aria-hidden
+          strokeWidth={2}
+          className="absolute end-4 top-6 size-6 text-muted transition-[translate,color] duration-[var(--duration-hover)] ease-[var(--ease-standard)] group-hover:-translate-y-0.5 group-hover:text-brand-text group-aria-expanded:text-brand-text rtl:-scale-x-100 lg:top-1/2 lg:-mt-3 motion-reduce:transition-none"
+        />
       </button>
 
       <div
@@ -191,21 +209,17 @@ function Row({
             {row.contribution ? (
               <BulletGroup heading={labels.whatIBuilt} items={row.contribution[locale]} />
             ) : null}
-            {row.tags ? (
-              <ul className="flex flex-wrap gap-2">
-                {row.tags.map((tag) => (
-                  <li key={tag}>
-                    <Badge>{tag}</Badge>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
             {row.href ? (
               <Button href={row.href} target="_blank" rel="noopener noreferrer" variant="outline" size="sm">
                 {githubLabel}
                 <ExternalArrow />
               </Button>
-            ) : null}
+            ) : (
+              <p className="inline-flex items-center gap-2 text-[15px] font-medium leading-5 text-muted">
+                <Lock aria-hidden className="size-4" strokeWidth={2} />
+                {labels.privateRepo}
+              </p>
+            )}
           </div>
         </div>
       </div>
